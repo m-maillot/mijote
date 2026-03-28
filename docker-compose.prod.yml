@@ -1,0 +1,39 @@
+services:
+  app:
+    image: ghcr.io/m-maillot/mijote:latest
+    ports:
+      - "3010:3000"
+    environment:
+      DATABASE_URL: "postgresql://recettes:recettes@db:5432/recettes?schema=public"
+      ADMIN_NAME: ""
+      ADMIN_EMAIL: ""
+      APP_URL: "http://localhost:3010"
+      SMTP_HOST: "smtp-relay.brevo.com"
+      SMTP_PORT: "587"
+      SMTP_USER: ""
+      SMTP_PASS: ""
+      SMTP_FROM: "Carnet de Recettes <recettes@famille.fr>"
+      APPROVAL_THRESHOLD: "2"
+    volumes:
+      - uploads:/app/public/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: recettes
+      POSTGRES_PASSWORD: recettes
+      POSTGRES_DB: recettes
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U recettes"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
+  uploads:

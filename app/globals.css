@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #FFF8F0;
+  --color-cream-dark: #F5E6D3;
+  --color-brown: #3E2723;
+  --color-brown-light: #5D4037;
+  --color-red: #C62828;
+  --color-red-light: #EF5350;
+  --color-green: #2E7D32;
+  --color-green-light: #66BB6A;
+  --color-amber: #F57F17;
+  --font-hand: "Caveat", cursive;
+  --font-body: "Inter", sans-serif;
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-brown);
+  font-family: var(--font-body);
+}
+
+/* Notebook lined background — line every 2.5rem (40px) */
+.notebook-bg {
+  --line-height: 2.5rem;
+  background-image:
+    repeating-linear-gradient(
+      transparent,
+      transparent calc(var(--line-height) - 1px),
+      #e8d5c4 calc(var(--line-height) - 1px),
+      #e8d5c4 var(--line-height)
+    );
+  background-size: 100% var(--line-height);
+}
+
+/* Notebook margin line */
+.notebook-margin {
+  border-left: 2px solid #e88b8b;
+  padding-left: 1rem;
+}
+
+/* Notebook text alignment — every element snaps to the line grid */
+.notebook-line {
+  line-height: 2.5rem;
+  padding: 0;
+  margin: 0;
+}
+
+/* Recipe card hover */
+.recipe-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.recipe-card:hover {
+  transform: rotate(0deg) scale(1.02);
+  box-shadow: 0 8px 25px rgba(62, 39, 35, 0.15);
+}
+
+/* Handwritten input style */
+.input-hand {
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed #a1887f;
+  font-family: var(--font-hand);
+  font-size: 1.25rem;
+  padding: 0;
+  margin: 0;
+  height: 2rem;
+  line-height: 2rem;
+  vertical-align: baseline;
+  outline: none;
+}
+.input-hand:focus {
+  border-bottom-color: var(--color-brown);
+}
+
+.textarea-hand {
+  background: transparent;
+  border: 1px dashed #a1887f;
+  border-radius: 0.5rem;
+  font-family: var(--font-hand);
+  font-size: 1.15rem;
+  padding: 0.75rem;
+  width: 100%;
+  outline: none;
+  resize: vertical;
+  min-height: 120px;
+}
+.textarea-hand:focus {
+  border-color: var(--color-brown);
+}

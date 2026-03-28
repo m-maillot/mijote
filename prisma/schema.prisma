@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Member {
+  id        String   @id @default(uuid())
+  name      String
+  email     String?
+  token     String   @unique
+  isAdmin   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  recipes  Recipe[]
+  comments Comment[]
+  votes    CommentVote[]
+}
+
+model Recipe {
+  id        String   @id @default(uuid())
+  title     String
+  steps     String
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author      Member       @relation(fields: [authorId], references: [id])
+  ingredients Ingredient[]
+  comments    Comment[]
+  photos      RecipePhoto[]
+}
+
+model Ingredient {
+  id       String  @id @default(uuid())
+  recipeId String
+  quantity String?
+  unit     String?
+  name     String
+  order    Int     @default(0)
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+}
+
+model RecipePhoto {
+  id        String   @id @default(uuid())
+  recipeId  String
+  filename  String
+  createdAt DateTime @default(now())
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+}
+
+enum CommentField {
+  GENERAL
+  TITLE
+  INGREDIENTS
+  STEPS
+}
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Comment {
+  id        String        @id @default(uuid())
+  recipeId  String
+  authorId  String
+  body      String
+  field     CommentField  @default(GENERAL)
+  status    CommentStatus @default(PENDING)
+  createdAt DateTime      @default(now())
+
+  recipe Recipe       @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  author Member       @relation(fields: [authorId], references: [id])
+  votes  CommentVote[]
+}
+
+model CommentVote {
+  id        String   @id @default(uuid())
+  commentId String
+  memberId  String
+  approve   Boolean
+  createdAt DateTime @default(now())
+
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  member  Member  @relation(fields: [memberId], references: [id])
+
+  @@unique([commentId, memberId])
+}
