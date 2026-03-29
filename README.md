@@ -101,6 +101,12 @@ Au premier lancement, le compte admin est automatiquement créé et son lien d'a
 docker compose logs app
 ```
 
+Pour récupérer le lien admin à tout moment :
+
+```bash
+docker compose exec app npx tsx prisma/show-admin.ts
+```
+
 ### Sur Synology
 
 1. Ouvrir **Container Manager**
