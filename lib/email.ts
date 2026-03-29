@@ -1,20 +1,32 @@
 import nodemailer from "nodemailer";
 import { prisma } from "./prisma";
 
+// Singleton : une seule connexion SMTP réutilisée
+let _transporter: nodemailer.Transporter | null = null;
+
 function getTransporter() {
   const host = process.env.SMTP_HOST;
   console.log(`[Email] Config SMTP: host=${host}, port=${process.env.SMTP_PORT}, user=${process.env.SMTP_USER}, from=${process.env.SMTP_FROM}`);
   if (!host) return null;
 
-  return nodemailer.createTransport({
-    host,
-    port: parseInt(process.env.SMTP_PORT || "587", 10),
-    secure: process.env.SMTP_PORT === "465",
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
+  if (!_transporter) {
+    console.log("[Email] Création du transporter SMTP (singleton)");
+    _transporter = nodemailer.createTransport({
+      host,
+      port: parseInt(process.env.SMTP_PORT || "587", 10),
+      secure: process.env.SMTP_PORT === "465",
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+      pool: true,         // Réutilise les connexions SMTP
+      maxConnections: 3,  // Max 3 connexions en parallèle
+      rateDelta: 1000,    // 1 email par seconde max
+      rateLimit: 1,
+    });
+  }
+
+  return _transporter;
 }
 
 export async function notifyNewRecipe(
