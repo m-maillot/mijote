@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getMemberFromRequest } from "@/lib/auth";
+import { notifyNewComment } from "@/lib/email";
 
 export async function POST(request: NextRequest) {
   const member = await getMemberFromRequest(request);
@@ -30,6 +31,11 @@ export async function POST(request: NextRequest) {
       votes: true,
     },
   });
+
+  // Notification email en arrière-plan
+  notifyNewComment(recipeId, recipe.title, member.name, commentField).catch((err) =>
+    console.error("[Email] Erreur notification commentaire:", err)
+  );
 
   return NextResponse.json(comment);
 }
