@@ -29,6 +29,9 @@ npm-debug.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# prisma compiled scripts
+/prisma/dist
+
 # uploads
 /public/uploads/*
 !/public/uploads/.gitkeep

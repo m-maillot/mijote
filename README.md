@@ -104,7 +104,7 @@ docker compose logs app
 Pour récupérer le lien admin à tout moment :
 
 ```bash
-docker compose exec app npx tsx prisma/show-admin.ts
+docker compose exec app node prisma/show-admin.js
 ```
 
 ### Sur Synology

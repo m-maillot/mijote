@@ -14,7 +14,7 @@ if ! npx prisma migrate deploy 2>&1; then
 fi
 
 echo "Initialisation du compte admin..."
-npx tsx prisma/init-admin.ts
+node prisma/init-admin.js
 
 echo "Démarrage de l'application..."
 exec node server.js
