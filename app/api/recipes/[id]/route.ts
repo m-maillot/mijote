@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getMemberFromRequest } from "@/lib/auth";
+import { notifyRecipeUpdated } from "@/lib/email";
 
 export async function GET(
   request: NextRequest,
@@ -71,6 +72,11 @@ export async function PATCH(
       include: { ingredients: { orderBy: { order: "asc" } } },
     });
   });
+
+  // Notification email en arrière-plan
+  notifyRecipeUpdated(id, updated.title, member.name).catch((err) =>
+    console.error("[Email] Erreur notification modification:", err)
+  );
 
   return NextResponse.json(updated);
 }

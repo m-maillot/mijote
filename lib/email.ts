@@ -89,6 +89,67 @@ export async function notifyNewRecipe(
   }
 }
 
+export async function notifyRecipeUpdated(
+  recipeId: string,
+  recipeTitle: string,
+  authorName: string
+) {
+  console.log(`[Email] Notification modification recette "${recipeTitle}" par ${authorName}`);
+  const transporter = getTransporter();
+  if (!transporter) {
+    console.log("[Email] SMTP non configuré, notification ignorée");
+    return;
+  }
+
+  const members = await prisma.member.findMany({
+    where: { email: { not: null } },
+    select: { email: true, token: true },
+  });
+
+  console.log(`[Email] ${members.length} membre(s) avec email trouvé(s)`);
+  if (members.length === 0) return;
+
+  const appUrl = process.env.APP_URL || "http://localhost:3010";
+
+  for (const member of members) {
+    if (!member.email) continue;
+
+    const recipeUrl = `${appUrl}/api/auth?token=${member.token}&redirect=/recettes/${recipeId}`;
+
+    try {
+      console.log(`[Email] Envoi notification modification à ${member.email}...`);
+      await transporter.sendMail({
+        from: process.env.SMTP_FROM || "Carnet de Recettes <noreply@famille.fr>",
+        to: member.email,
+        subject: `Recette modifiée : ${recipeTitle}`,
+        html: `
+          <div style="font-family: Georgia, serif; max-width: 500px; margin: 0 auto; padding: 20px;">
+            <h1 style="font-family: 'Brush Script MT', cursive; color: #3E2723; font-size: 28px;">
+              Carnet de Recettes
+            </h1>
+            <p style="color: #5D4037;">
+              <strong>${authorName}</strong> a mis à jour la recette :
+            </p>
+            <h2 style="font-family: 'Brush Script MT', cursive; color: #C62828; font-size: 24px;">
+              ${recipeTitle}
+            </h2>
+            <a href="${recipeUrl}"
+               style="display: inline-block; background: #3E2723; color: #FFF8F0; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-size: 16px;">
+              Voir la recette
+            </a>
+            <p style="color: #a1887f; font-size: 12px; margin-top: 20px;">
+              Vous recevez cet email car vous faites partie du carnet de recettes familial.
+            </p>
+          </div>
+        `,
+      });
+      console.log(`[Email] Envoyé avec succès à ${member.email}`);
+    } catch (err) {
+      console.error(`[Email] Erreur envoi à ${member.email}:`, err);
+    }
+  }
+}
+
 export async function notifyNewComment(
   recipeId: string,
   recipeTitle: string,
