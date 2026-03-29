@@ -1,24 +1,32 @@
-FROM node:22-alpine AS base
-
-# --- Dependencies ---
-FROM base AS deps
+# ─── Étape 1 : dépendances ────────────────────────────────────────────────────
+FROM node:22-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY prisma ./prisma/
+# Installe toutes les deps (dev inclus) pour le build
 RUN npm ci
 
-# --- Build ---
-FROM base AS builder
+# ─── Étape 2 : build ──────────────────────────────────────────────────────────
+FROM node:22-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN npx prisma generate
-RUN npm run build
-# Compiler les scripts TS en JS pour éviter tsx en production
-RUN npx tsc prisma/init-admin.ts prisma/show-admin.ts --esModuleInterop --module commonjs --skipLibCheck --outDir prisma/dist
 
-# --- Production ---
-FROM base AS runner
+# Génère le client Prisma et build Next.js (standalone)
+RUN npx prisma generate && npm run build
+
+# Compile les scripts TS → JS (sans tsx ni uuid en prod)
+RUN node_modules/.bin/tsc \
+      prisma/init-admin.ts \
+      prisma/show-admin.ts \
+      --esModuleInterop \
+      --module commonjs \
+      --moduleResolution node \
+      --skipLibCheck \
+      --outDir prisma/dist
+
+# ─── Étape 3 : image de production ────────────────────────────────────────────
+FROM node:22-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -26,25 +34,27 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
-# Fichiers nécessaires au runtime
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/prisma/schema.prisma ./prisma/schema.prisma
-COPY --from=builder /app/prisma/migrations ./prisma/migrations
-COPY --from=builder /app/prisma/dist ./prisma/
-COPY --from=builder /app/entrypoint.sh ./entrypoint.sh
-COPY --from=builder /app/package.json ./package.json
-
-# Standalone output de Next.js
+# App Next.js standalone (contient server.js + node_modules runtime)
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Prisma : uniquement le client généré et le CLI pour les migrations
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
-COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
+# Fichiers publics
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
-# uuid pour init-admin (dépendance légère)
-RUN npm install --no-save uuid
+# Prisma : binaire natif du query engine (non inclus dans standalone)
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+
+# Prisma CLI : uniquement pour `prisma migrate deploy` au démarrage
+COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
+
+# Migrations et scripts d'init (compilés en JS, pas de tsx en prod)
+COPY --from=builder /app/prisma/schema.prisma ./prisma/schema.prisma
+COPY --from=builder /app/prisma/migrations ./prisma/migrations
+COPY --from=builder /app/prisma/dist ./prisma/
+
+# Entrypoint
+COPY --from=builder /app/entrypoint.sh ./entrypoint.sh
 
 # Dossier uploads
 RUN mkdir -p /app/public/uploads && chown -R nextjs:nodejs /app/public/uploads

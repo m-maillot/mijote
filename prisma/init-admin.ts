@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { v4 as uuid } from "uuid";
+import { randomUUID } from "crypto";
 
 const prisma = new PrismaClient();
 
@@ -18,7 +18,7 @@ async function main() {
     return;
   }
 
-  const token = uuid();
+  const token = randomUUID();
   await prisma.member.create({
     data: {
       name: adminName,
