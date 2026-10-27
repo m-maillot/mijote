@@ -44,8 +44,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 # Prisma : binaire natif du query engine (non inclus dans standalone)
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
-# Prisma CLI : uniquement pour `prisma migrate deploy` au démarrage
-COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
 
 # Migrations et scripts d'init (compilés en JS, pas de tsx en prod)
@@ -55,6 +53,12 @@ COPY --from=builder /app/prisma/dist ./prisma/
 
 # Entrypoint
 COPY --from=builder /app/entrypoint.sh ./entrypoint.sh
+
+# Prisma CLI isolé (avec toutes ses dépendances) pour `prisma migrate deploy` au démarrage.
+# Version alignée sur package.json ; openssl est requis par les moteurs Prisma sur Alpine.
+RUN apk add --no-cache openssl && \
+    npm install --prefix /opt/prisma --no-audit --no-fund prisma@6.19.2 && \
+    npm cache clean --force
 
 USER nextjs
 
