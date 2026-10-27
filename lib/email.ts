@@ -42,7 +42,7 @@ export async function notifyNewRecipe(
 
   const members = await prisma.member.findMany({
     where: { email: { not: null } },
-    select: { email: true, token: true },
+    select: { email: true },
   });
 
   console.log(`[Email] ${members.length} membre(s) avec email trouvé(s)`);
@@ -53,7 +53,7 @@ export async function notifyNewRecipe(
   for (const member of members) {
     if (!member.email) continue;
 
-    const recipeUrl = `${appUrl}/api/auth?token=${member.token}&redirect=/recettes/${recipeId}`;
+    const recipeUrl = `${appUrl}/recettes/${recipeId}`;
 
     try {
       console.log(`[Email] Envoi à ${member.email}...`);
@@ -103,7 +103,7 @@ export async function notifyRecipeUpdated(
 
   const members = await prisma.member.findMany({
     where: { email: { not: null } },
-    select: { email: true, token: true },
+    select: { email: true },
   });
 
   console.log(`[Email] ${members.length} membre(s) avec email trouvé(s)`);
@@ -114,7 +114,7 @@ export async function notifyRecipeUpdated(
   for (const member of members) {
     if (!member.email) continue;
 
-    const recipeUrl = `${appUrl}/api/auth?token=${member.token}&redirect=/recettes/${recipeId}`;
+    const recipeUrl = `${appUrl}/recettes/${recipeId}`;
 
     try {
       console.log(`[Email] Envoi notification modification à ${member.email}...`);
@@ -165,7 +165,7 @@ export async function notifyNewComment(
 
   const members = await prisma.member.findMany({
     where: { email: { not: null } },
-    select: { email: true, token: true, name: true },
+    select: { email: true, name: true },
   });
 
   console.log(`[Email] ${members.length} membre(s) avec email trouvé(s)`);
@@ -183,7 +183,7 @@ export async function notifyNewComment(
   for (const member of members) {
     if (!member.email) continue;
 
-    const recipeUrl = `${appUrl}/api/auth?token=${member.token}&redirect=/recettes/${recipeId}`;
+    const recipeUrl = `${appUrl}/recettes/${recipeId}`;
 
     try {
       console.log(`[Email] Envoi notification commentaire à ${member.email}...`);
@@ -216,5 +216,38 @@ export async function notifyNewComment(
     } catch (err) {
       console.error(`[Email] Erreur envoi à ${member.email}:`, err);
     }
+  }
+}
+
+export async function sendLoginLink(email: string, name: string, link: string) {
+  const transporter = getTransporter();
+  if (!transporter) {
+    console.log(`[Email] SMTP non configuré, lien de connexion pour ${email} : ${link}`);
+    return;
+  }
+
+  try {
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || "Carnet de Recettes <noreply@famille.fr>",
+      to: email,
+      subject: "Votre lien de connexion à Mijoté",
+      html: `
+        <div style="font-family: Georgia, serif; max-width: 500px; margin: 0 auto; padding: 20px;">
+          <h1 style="font-family: 'Brush Script MT', cursive; color: #3E2723; font-size: 28px;">
+            Carnet de Recettes
+          </h1>
+          <p style="color: #5D4037;">Bonjour ${name}, voici votre lien de connexion :</p>
+          <a href="${link}"
+             style="display: inline-block; background: #3E2723; color: #FFF8F0; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-size: 16px;">
+            Me connecter
+          </a>
+          <p style="color: #a1887f; font-size: 12px; margin-top: 20px;">
+            Ce lien est valable 15 minutes et ne peut servir qu'une fois. Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.
+          </p>
+        </div>
+      `,
+    });
+  } catch (err) {
+    console.error(`[Email] Erreur envoi du lien de connexion à ${email}:`, err);
   }
 }

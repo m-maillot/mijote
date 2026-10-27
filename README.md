@@ -1,16 +1,16 @@
 # Mijoté
 
-Application web familiale pour collecter et partager les recettes de famille. Chaque membre accède à l'application via un lien personnel unique (sans mot de passe). Les membres peuvent ajouter des recettes, et proposer des modifications sous forme de suggestions soumises au vote de la famille.
+Application web familiale pour collecter et partager les recettes de famille. Chaque membre se connecte avec un lien magique envoyé par email ou avec son compte Google (sans mot de passe). Les membres peuvent ajouter des recettes, et proposer des modifications sous forme de suggestions soumises au vote de la famille.
 
 ## Fonctionnalités
 
 - **Recettes structurées** : titre, ingrédients (quantité, unité, nom), étapes de préparation, photos
-- **Authentification simplifiée** : accès par lien unique, sans compte ni mot de passe
+- **Authentification simplifiée** : lien magique par email ou compte Google, réservé aux membres invités
 - **Suggestions collaboratives** : proposer des modifications sur le titre, les ingrédients ou les étapes
 - **Système de vote** : les suggestions sont appliquées automatiquement après approbation (seuil configurable)
 - **Vue diff** : visualisation des différences entre la recette et la suggestion
 - **Notifications email** : notification à toute la famille quand une nouvelle recette est ajoutée
-- **Administration** : gestion des membres et de leurs liens d'accès par un compte admin
+- **Administration** : invitation des membres (par email) par un compte admin
 - **Design cahier de recettes** : interface inspirée des vieux cahiers manuscrits, responsive mobile
 
 ## Stack technique
@@ -61,11 +61,13 @@ L'application est accessible sur http://localhost:3010.
 
 Le seed crée 3 membres et 3 recettes :
 
-| Membre | Lien |
-|--------|------|
-| Mamie Jeanne (admin) | http://localhost:3010/api/auth?token=mamie-token-secret |
-| Papa Michel | http://localhost:3010/api/auth?token=papa-token-secret |
-| Maman Sophie | http://localhost:3010/api/auth?token=maman-token-secret |
+| Membre | Email |
+|--------|-------|
+| Mamie Jeanne (admin) | mamie@famille.test |
+| Papa Michel | papa@famille.test |
+| Maman Sophie | maman@famille.test |
+
+Sans SMTP configuré, le lien magique est affiché dans les logs du serveur.
 
 ## Déploiement (Docker)
 
@@ -95,13 +97,13 @@ environment:
 docker compose up -d
 ```
 
-Au premier lancement, le compte admin est automatiquement créé et son lien d'accès est affiché dans les logs :
+Au démarrage, le compte admin défini par `ADMIN_NAME` / `ADMIN_EMAIL` est créé (ou promu admin s'il existe déjà). Connectez-vous ensuite avec cet email (lien magique ou Google) :
 
 ```bash
 docker compose logs app
 ```
 
-Pour récupérer le lien admin à tout moment :
+Pour lister les comptes admin :
 
 ```bash
 docker compose exec app node prisma/show-admin.js

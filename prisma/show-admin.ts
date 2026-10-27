@@ -3,15 +3,15 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  const admin = await prisma.member.findFirst({ where: { isAdmin: true } });
-  if (!admin) {
+  const admins = await prisma.member.findMany({ where: { isAdmin: true } });
+  if (admins.length === 0) {
     console.log("Aucun compte admin trouvé.");
     process.exit(1);
   }
 
-  const appUrl = process.env.APP_URL || "http://localhost:3000";
-  console.log(`Compte admin : ${admin.name}`);
-  console.log(`Lien de connexion : ${appUrl}/api/auth?token=${admin.token}`);
+  for (const admin of admins) {
+    console.log(`Compte admin : ${admin.name} <${admin.email ?? "pas d'email"}>`);
+  }
 }
 
 main()

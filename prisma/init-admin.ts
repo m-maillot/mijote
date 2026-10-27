@@ -1,38 +1,24 @@
 import { PrismaClient } from "@prisma/client";
-import { randomUUID } from "crypto";
 
 const prisma = new PrismaClient();
 
 async function main() {
   const adminName = process.env.ADMIN_NAME;
-  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
 
-  if (!adminName) {
-    console.log("[Init] ADMIN_NAME non défini, pas de création de compte admin.");
+  if (!adminName || !adminEmail) {
+    console.log("[Init] ADMIN_NAME ou ADMIN_EMAIL non défini, pas de création de compte admin.");
     return;
   }
 
-  const existingAdmin = await prisma.member.findFirst({ where: { isAdmin: true } });
-  if (existingAdmin) {
-    console.log(`[Init] Un compte admin existe déjà : ${existingAdmin.name}`);
-    return;
-  }
-
-  const token = randomUUID();
-  await prisma.member.create({
-    data: {
-      name: adminName,
-      email: adminEmail || null,
-      token,
-      isAdmin: true,
-    },
+  // L'email est l'identifiant de connexion : le compte admin est celui de ADMIN_EMAIL.
+  const admin = await prisma.member.upsert({
+    where: { email: adminEmail },
+    update: { isAdmin: true },
+    create: { name: adminName, email: adminEmail, isAdmin: true },
   });
 
-  console.log(`[Init] Compte admin créé !`);
-  console.log(`  Nom   : ${adminName}`);
-  console.log(`  Email : ${adminEmail || "(non défini)"}`);
-  console.log(`  Token : ${token}`);
-  console.log(`  Lien  : ${process.env.APP_URL || "http://localhost:3000"}/api/auth?token=${token}`);
+  console.log(`[Init] Compte admin prêt : ${admin.name} <${adminEmail}>`);
 }
 
 main()

@@ -4,21 +4,21 @@ const prisma = new PrismaClient();
 
 async function main() {
   const mamie = await prisma.member.upsert({
-    where: { token: "mamie-token-secret" },
+    where: { email: "mamie@famille.test" },
     update: {},
-    create: { name: "Mamie Jeanne", token: "mamie-token-secret", isAdmin: true },
+    create: { name: "Mamie Jeanne", email: "mamie@famille.test", isAdmin: true },
   });
 
   const papa = await prisma.member.upsert({
-    where: { token: "papa-token-secret" },
+    where: { email: "papa@famille.test" },
     update: {},
-    create: { name: "Papa Michel", token: "papa-token-secret" },
+    create: { name: "Papa Michel", email: "papa@famille.test" },
   });
 
   const maman = await prisma.member.upsert({
-    where: { token: "maman-token-secret" },
+    where: { email: "maman@famille.test" },
     update: {},
-    create: { name: "Maman Sophie", token: "maman-token-secret" },
+    create: { name: "Maman Sophie", email: "maman@famille.test" },
   });
 
   await prisma.recipe.upsert({
@@ -115,10 +115,8 @@ async function main() {
   });
 
   console.log("Seed terminé !");
-  console.log(`\nLiens d'accès :`);
-  console.log(`  Mamie Jeanne : http://localhost:3010/api/auth?token=mamie-token-secret`);
-  console.log(`  Papa Michel  : http://localhost:3010/api/auth?token=papa-token-secret`);
-  console.log(`  Maman Sophie : http://localhost:3010/api/auth?token=maman-token-secret`);
+  console.log(`\nComptes de démo (connexion par lien magique, voir les logs si SMTP non configuré) :`);
+  console.log(`  mamie@famille.test (admin), papa@famille.test, maman@famille.test`);
 }
 
 main()

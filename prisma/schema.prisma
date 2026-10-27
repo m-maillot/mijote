@@ -10,14 +10,36 @@ datasource db {
 model Member {
   id        String   @id @default(uuid())
   name      String
-  email     String?
-  token     String   @unique
+  email     String?  @unique
   isAdmin   Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  recipes  Recipe[]
-  comments Comment[]
-  votes    CommentVote[]
+  recipes     Recipe[]
+  comments    Comment[]
+  votes       CommentVote[]
+  sessions    Session[]
+  loginTokens LoginToken[]
+}
+
+// Seuls les hash sont stockés : un dump de la base ne permet pas de se connecter.
+model Session {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique
+  memberId  String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+}
+
+model LoginToken {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique
+  memberId  String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
 }
 
 model Recipe {

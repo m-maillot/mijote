@@ -1,7 +1,5 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import { COOKIE_NAME } from "@/lib/auth";
+import { getMemberFromCookie } from "@/lib/auth";
 import Header from "@/components/layout/Header";
 
 export default async function RecettesLayout({
@@ -9,12 +7,7 @@ export default async function RecettesLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(COOKIE_NAME)?.value;
-
-  if (!token) redirect("/");
-
-  const member = await prisma.member.findUnique({ where: { token } });
+  const member = await getMemberFromCookie();
   if (!member) redirect("/");
 
   return (

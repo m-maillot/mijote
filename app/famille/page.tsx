@@ -7,7 +7,6 @@ interface Member {
   id: string;
   name: string;
   email: string | null;
-  token: string;
   isAdmin: boolean;
   createdAt: string;
   _count: { recipes: number };
@@ -29,10 +28,6 @@ export default function FamillePage() {
 
   useEffect(() => { loadMembers(); }, []);
 
-  function getLink(token: string) {
-    return `${window.location.origin}/api/auth?token=${token}`;
-  }
-
   async function handleInvite(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim()) return;
@@ -42,14 +37,14 @@ export default function FamillePage() {
       const res = await fetch("/api/members", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), email: email.trim() || null }),
+        body: JSON.stringify({ name: name.trim(), email: email.trim() }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error((await res.json()).error);
       setName("");
       setEmail("");
       loadMembers();
-    } catch {
-      alert("Erreur lors de la création");
+    } catch (err) {
+      alert((err as Error).message || "Erreur lors de la création");
     } finally {
       setCreating(false);
     }
@@ -60,7 +55,7 @@ export default function FamillePage() {
       const res = await fetch(`/api/members/${memberId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: editEmailValue.trim() || null }),
+        body: JSON.stringify({ email: editEmailValue.trim() }),
       });
       if (!res.ok) throw new Error();
       setEditingEmail(null);
@@ -68,10 +63,6 @@ export default function FamillePage() {
     } catch {
       alert("Erreur lors de la mise à jour");
     }
-  }
-
-  function copyLink(token: string) {
-    navigator.clipboard.writeText(getLink(token));
   }
 
   return (
@@ -101,8 +92,9 @@ export default function FamillePage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="field flex-1"
-              placeholder="Email (optionnel)"
-              aria-label="Email (optionnel)"
+              placeholder="Email"
+              aria-label="Email"
+              required
             />
           </div>
           <button
@@ -169,34 +161,16 @@ export default function FamillePage() {
               ) : (
                 <>
                   <span className="text-sm text-muted">
-                    {m.email || "Pas d'email"}
+                    {m.email || "Pas d'email : ne peut pas se connecter"}
                   </span>
                   <button
                     onClick={() => { setEditingEmail(m.id); setEditEmailValue(m.email || ""); }}
                     className="min-h-11 px-2 text-sm text-muted underline transition-colors hover:text-ink"
                   >
-                    {m.email ? "Modifier" : "Ajouter"}
+                    Modifier
                   </button>
                 </>
               )}
-            </div>
-
-            {/* Connection link */}
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                readOnly
-                value={getLink(m.token)}
-                className="field flex-1 select-all text-sm text-muted"
-                aria-label={`Lien de connexion de ${m.name}`}
-                onClick={(e) => (e.target as HTMLInputElement).select()}
-              />
-              <button
-                onClick={() => copyLink(m.token)}
-                className="min-h-12 whitespace-nowrap rounded-lg bg-primary px-4 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-hover"
-              >
-                Copier
-              </button>
             </div>
           </div>
         ))}

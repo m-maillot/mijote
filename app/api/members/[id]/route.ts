@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getMemberFromRequest } from "@/lib/auth";
+import { getMemberFromRequest, normalizeEmail } from "@/lib/auth";
 
 export async function PATCH(
   request: NextRequest,
@@ -11,11 +11,16 @@ export async function PATCH(
   if (!member.isAdmin) return NextResponse.json({ error: "Accès réservé aux administrateurs" }, { status: 403 });
 
   const { id } = await params;
-  const { email } = await request.json();
+  const email = normalizeEmail((await request.json()).email);
+  if (!email) return NextResponse.json({ error: "Un email valide est requis" }, { status: 400 });
+  const taken = await prisma.member.findUnique({ where: { email } });
+  if (taken && taken.id !== id) {
+    return NextResponse.json({ error: "Cet email est déjà utilisé" }, { status: 409 });
+  }
 
   const updated = await prisma.member.update({
     where: { id },
-    data: { email: email || null },
+    data: { email },
     select: { id: true, name: true, email: true },
   });
 

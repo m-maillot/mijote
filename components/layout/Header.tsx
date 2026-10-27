@@ -1,6 +1,7 @@
 import Link from "next/link";
 import NavLinks from "./NavLinks";
 import Avatar from "@/components/ui/Avatar";
+import LogoutButton from "./LogoutButton";
 import { memberInk } from "@/lib/memberInk";
 
 interface HeaderProps {
@@ -21,6 +22,7 @@ export default function Header({ memberName, isAdmin }: HeaderProps) {
             <Avatar name={memberName} size={36} />
             <span className="hidden sm:inline">{memberName}</span>
           </span>
+          <LogoutButton />
         </div>
       </div>
     </header>
