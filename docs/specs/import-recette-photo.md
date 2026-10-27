@@ -112,9 +112,10 @@ Auth requise. Renvoie `{ limit, used, remaining, resetsAt }`.
 - SDK : `@anthropic-ai/sdk`, appel serveur uniquement. Clé dans `ANTHROPIC_API_KEY`.
 - Modèle : configurable via `ANTHROPIC_MODEL`, défaut `claude-sonnet-5-5`. À comparer avec Haiku sur un jeu de photos réelles (surtout du manuscrit) avant de fixer le défaut.
 - Images : envoyées en blocs `image` base64, avant le texte du prompt.
-- Sortie structurée : **tool use forcé** (`tool_choice: { type: "tool", name: "enregistrer_recette" }`) avec un `input_schema` JSON qui reprend le format de la réponse ci-dessus, plus un champ `is_recipe: boolean` et `warnings: string[]`.
+- Sortie structurée : `output_config.format` de type `json_schema` (le `tool_choice` forcé est refusé par Sonnet 5.5 : erreur 400). Le schéma reprend le format de la réponse ci-dessus, plus `is_recipe: boolean` et `warnings: string[]`. Le JSON est lu dans le bloc `text` de la réponse ; un `stop_reason` `refusal` ou `max_tokens` est traité comme un échec.
+- Effort : `low` (extraction, pas de raisonnement poussé nécessaire).
 - Timeout : 45 s, aucun retry automatique (un retry consommerait du temps pour rien et masquerait les pannes).
-- `max_tokens` : 2000.
+- `max_tokens` : 4000.
 
 ### Prompt système (brouillon)
 
