@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getMemberFromRequest } from "@/lib/auth";
-import { v4 as uuid } from "uuid";
 
 export async function GET(request: NextRequest) {
   const member = await getMemberFromRequest(request);
@@ -45,7 +44,7 @@ export async function POST(request: NextRequest) {
     data: {
       name: name.trim(),
       email: email || null,
-      token: uuid(),
+      token: crypto.randomUUID(),
     },
   });
 
