@@ -56,9 +56,6 @@ COPY --from=builder /app/prisma/dist ./prisma/
 # Entrypoint
 COPY --from=builder /app/entrypoint.sh ./entrypoint.sh
 
-# Dossier uploads
-RUN mkdir -p /app/public/uploads && chown -R nextjs:nodejs /app/public/uploads
-
 USER nextjs
 
 EXPOSE 3000

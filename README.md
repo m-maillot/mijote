@@ -121,7 +121,7 @@ docker compose exec app node prisma/show-admin.js
 | Donnée | Volume |
 |--------|--------|
 | Base de données | `pgdata` |
-| Photos des recettes | `uploads` |
+| Photos des recettes | Bucket S3 (voir `S3_*`) |
 
 ## Configuration
 
@@ -131,6 +131,11 @@ docker compose exec app node prisma/show-admin.js
 | `ADMIN_NAME` | Nom du compte admin (1er lancement) | — |
 | `ADMIN_EMAIL` | Email du compte admin | — |
 | `APP_URL` | URL publique de l'application | `http://localhost:3000` |
+| `S3_BUCKET` | Bucket S3 des photos | — |
+| `S3_REGION` | Région S3 | `us-east-1` |
+| `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` | Identifiants S3 | — |
+| `S3_ENDPOINT` | Endpoint S3 compatible (vide = AWS) | — |
+| `S3_FORCE_PATH_STYLE` | `true` pour MinIO et similaires | `false` |
 | `APPROVAL_THRESHOLD` | Nombre de votes pour approuver une suggestion | `2` |
 | `SMTP_HOST` | Serveur SMTP | — |
 | `SMTP_PORT` | Port SMTP | `587` |

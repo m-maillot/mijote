@@ -46,7 +46,7 @@ export default async function RecettesPage() {
               {recipe.photos[0] && (
                 <div className="mb-3 rounded-lg overflow-hidden h-40 bg-cream-dark">
                   <img
-                    src={`/uploads/${recipe.photos[0].filename}`}
+                    src={`/api/photos/${recipe.photos[0].filename}`}
                     alt={recipe.title}
                     className="w-full h-full object-cover"
                   />

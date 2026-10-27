@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getMemberFromRequest } from "@/lib/auth";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
-import { v4 as uuid } from "uuid";
+import { randomUUID } from "crypto";
+import { putPhoto } from "@/lib/storage";
 
 export async function POST(
   request: NextRequest,
@@ -20,13 +19,19 @@ export async function POST(
   const file = formData.get("photo") as File | null;
   if (!file) return NextResponse.json({ error: "Aucun fichier" }, { status: 400 });
 
-  const ext = file.name.split(".").pop() || "jpg";
-  const filename = `${uuid()}.${ext}`;
-  const uploadDir = path.join(process.cwd(), "public", "uploads");
-  await mkdir(uploadDir, { recursive: true });
+  if (!file.type.startsWith("image/")) {
+    return NextResponse.json({ error: "Le fichier doit être une image" }, { status: 400 });
+  }
 
-  const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(uploadDir, filename), buffer);
+  const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+  const filename = `${randomUUID()}.${ext}`;
+
+  try {
+    await putPhoto(`photos/${filename}`, Buffer.from(await file.arrayBuffer()), file.type);
+  } catch (err) {
+    console.error("[storage] envoi photo:", err);
+    return NextResponse.json({ error: "Erreur de stockage" }, { status: 500 });
+  }
 
   const photo = await prisma.recipePhoto.create({
     data: { recipeId: id, filename },

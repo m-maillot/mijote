@@ -39,7 +39,7 @@ export default async function RecipeDetailPage({
       {recipe.photos.length > 0 && (
         <div className="mb-6 rounded-xl overflow-hidden">
           <img
-            src={`/uploads/${recipe.photos[0].filename}`}
+            src={`/api/photos/${recipe.photos[0].filename}`}
             alt={recipe.title}
             className="w-full max-h-80 object-cover"
           />
