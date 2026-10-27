@@ -68,7 +68,8 @@ export async function reserveImport(memberId: string, imageCount: number): Promi
   const day = currentDay();
 
   return prisma.$transaction(async (tx) => {
-    await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${memberId}))`;
+    // $executeRaw : la fonction renvoie `void`, que $queryRaw ne sait pas désérialiser.
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${memberId}))`;
     const used = await tx.recipeImport.count({ where: countedWhere(memberId, day) });
     if (used >= limit) return null;
     const created = await tx.recipeImport.create({ data: { memberId, day, imageCount } });
