@@ -101,23 +101,24 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
       <div>
-        <label className="font-[family-name:var(--font-hand)] text-2xl text-brown block mb-2">
+        <label htmlFor="title" className="font-heading text-xl font-semibold block mb-2">
           Titre de la recette
         </label>
         <input
+          id="title"
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="input-hand w-full text-2xl"
+          className="field text-lg"
           placeholder="Ex: Gratin dauphinois de Mamie..."
           required
         />
       </div>
 
       <div>
-        <label className="font-[family-name:var(--font-hand)] text-2xl text-brown block mb-3">
+        <p className="font-heading text-xl font-semibold block mb-3">
           Ingrédients
-        </label>
+        </p>
         <div className="space-y-2">
           {ingredients.map((ing, index) => (
             <IngredientInput
@@ -135,21 +136,22 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
         <button
           type="button"
           onClick={addIngredient}
-          className="mt-3 text-brown-light hover:text-brown font-[family-name:var(--font-hand)] text-lg transition-colors flex items-center gap-1"
+          className="mt-3 flex min-h-11 items-center gap-1 font-medium text-muted transition-colors hover:text-ink"
         >
           <span className="text-xl">+</span> Ajouter un ingrédient
         </button>
       </div>
 
       <div>
-        <label className="font-[family-name:var(--font-hand)] text-2xl text-brown block mb-2">
+        <label htmlFor="steps" className="font-heading text-xl font-semibold block mb-2">
           Préparation
         </label>
-        <p className="text-xs text-brown-light mb-2">Une étape par ligne</p>
+        <p className="text-sm text-muted mb-2">Une étape par ligne</p>
         <textarea
+          id="steps"
           value={steps}
           onChange={(e) => setSteps(e.target.value)}
-          className="textarea-hand"
+          className="field"
           placeholder={"Préchauffer le four à 180°C\nÉplucher et couper les pommes de terre\nFrotter le plat avec l'ail..."}
           rows={10}
           required
@@ -158,14 +160,15 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
 
       {!isEdit && (
         <div>
-          <label className="font-[family-name:var(--font-hand)] text-2xl text-brown block mb-2">
+          <label htmlFor="photo" className="font-heading text-xl font-semibold block mb-2">
             Photo (optionnel)
           </label>
           <input
+            id="photo"
             type="file"
             accept="image/*"
             onChange={(e) => setPhoto(e.target.files?.[0] ?? null)}
-            className="text-sm text-brown-light file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-cream-dark file:text-brown file:font-[family-name:var(--font-hand)] file:text-lg file:cursor-pointer hover:file:bg-brown hover:file:text-cream"
+            className="text-sm text-muted file:mr-4 file:py-2 file:px-4 file:min-h-11 file:rounded-lg file:border-0 file:bg-subtle file:font-medium file:text-ink file:cursor-pointer hover:file:bg-ink hover:file:text-page"
           />
         </div>
       )}
@@ -173,7 +176,7 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
       <button
         type="submit"
         disabled={saving}
-        className="bg-brown text-cream px-8 py-3 rounded-xl font-[family-name:var(--font-hand)] text-xl hover:bg-brown-light transition-colors disabled:opacity-50"
+        className="min-h-12 w-full rounded-lg bg-primary px-8 font-semibold text-on-primary transition-colors hover:bg-primary-hover disabled:opacity-50 sm:w-auto"
       >
         {saving ? "Enregistrement..." : isEdit ? "Mettre à jour" : "Ajouter la recette"}
       </button>

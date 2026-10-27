@@ -23,7 +23,7 @@ interface DiffViewProps {
 export default function DiffView({ comment, recipe }: DiffViewProps) {
   if (comment.field === "GENERAL") {
     return (
-      <div className="font-[family-name:var(--font-hand)] text-lg text-brown whitespace-pre-wrap">
+      <div className="text-ink whitespace-pre-wrap">
         {comment.body}
       </div>
     );
@@ -33,17 +33,17 @@ export default function DiffView({ comment, recipe }: DiffViewProps) {
     const oldTitle = recipe.title;
     const newTitle = comment.body;
     if (oldTitle === newTitle) {
-      return <div className="font-[family-name:var(--font-hand)] text-lg text-brown">{newTitle}</div>;
+      return <div className="text-ink">{newTitle}</div>;
     }
     return (
       <div className="space-y-1 text-sm">
         <div className="flex items-center gap-2">
-          <span className="bg-red/15 text-red px-2 py-0.5 rounded font-mono text-xs shrink-0">−</span>
-          <span className="line-through text-red/70 font-[family-name:var(--font-hand)] text-lg">{oldTitle}</span>
+          <span className="bg-danger/15 text-danger px-2 py-0.5 rounded font-mono text-xs shrink-0">−</span>
+          <span className="line-through text-danger">{oldTitle}</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="bg-green/15 text-green px-2 py-0.5 rounded font-mono text-xs shrink-0">+</span>
-          <span className="text-green font-[family-name:var(--font-hand)] text-lg">{newTitle}</span>
+          <span className="bg-success/15 text-success px-2 py-0.5 rounded font-mono text-xs shrink-0">+</span>
+          <span className="text-success">{newTitle}</span>
         </div>
       </div>
     );
@@ -55,7 +55,7 @@ export default function DiffView({ comment, recipe }: DiffViewProps) {
       suggestedIngs = JSON.parse(comment.body);
     } catch {
       return (
-        <div className="font-[family-name:var(--font-hand)] text-lg text-brown whitespace-pre-wrap">
+        <div className="text-ink whitespace-pre-wrap">
           {comment.body}
         </div>
       );
@@ -65,7 +65,7 @@ export default function DiffView({ comment, recipe }: DiffViewProps) {
     const hasChanges = diffs.some((d) => d.type !== "same");
 
     if (!hasChanges) {
-      return <div className="text-brown-light text-sm">Aucune modification</div>;
+      return <div className="text-muted text-sm">Aucune modification</div>;
     }
 
     return (
@@ -75,23 +75,23 @@ export default function DiffView({ comment, recipe }: DiffViewProps) {
             return (
               <div key={i} className="flex items-center gap-2 py-0.5">
                 <span className="w-5 shrink-0" />
-                <span className="font-[family-name:var(--font-hand)] text-lg text-brown">{d.value}</span>
+                <span className="text-ink">{d.value}</span>
               </div>
             );
           }
           if (d.type === "removed") {
             return (
-              <div key={i} className="flex items-center gap-2 py-0.5 bg-red/5 rounded">
-                <span className="bg-red/15 text-red px-1.5 py-0.5 rounded font-mono text-xs shrink-0">−</span>
-                <span className="font-[family-name:var(--font-hand)] text-lg text-red/70 line-through">{d.oldValue}</span>
+              <div key={i} className="flex items-center gap-2 py-0.5 bg-danger/5 rounded">
+                <span className="bg-danger/15 text-danger px-1.5 py-0.5 rounded font-mono text-xs shrink-0">−</span>
+                <span className="text-danger line-through">{d.oldValue}</span>
               </div>
             );
           }
           if (d.type === "added") {
             return (
-              <div key={i} className="flex items-center gap-2 py-0.5 bg-green/5 rounded">
-                <span className="bg-green/15 text-green px-1.5 py-0.5 rounded font-mono text-xs shrink-0">+</span>
-                <span className="font-[family-name:var(--font-hand)] text-lg text-green">{d.newValue}</span>
+              <div key={i} className="flex items-center gap-2 py-0.5 bg-success/5 rounded">
+                <span className="bg-success/15 text-success px-1.5 py-0.5 rounded font-mono text-xs shrink-0">+</span>
+                <span className="text-success">{d.newValue}</span>
               </div>
             );
           }
@@ -106,7 +106,7 @@ export default function DiffView({ comment, recipe }: DiffViewProps) {
     const hasChanges = diffs.some((d) => d.type !== "same");
 
     if (!hasChanges) {
-      return <div className="text-brown-light text-sm">Aucune modification</div>;
+      return <div className="text-muted text-sm">Aucune modification</div>;
     }
 
     return (
@@ -116,23 +116,23 @@ export default function DiffView({ comment, recipe }: DiffViewProps) {
             return (
               <div key={i} className="flex items-center gap-2 py-0.5">
                 <span className="w-5 shrink-0" />
-                <span className="font-[family-name:var(--font-hand)] text-lg text-brown">{d.value}</span>
+                <span className="text-ink">{d.value}</span>
               </div>
             );
           }
           if (d.type === "removed") {
             return (
-              <div key={i} className="flex items-center gap-2 py-0.5 bg-red/5 rounded">
-                <span className="bg-red/15 text-red px-1.5 py-0.5 rounded font-mono text-xs shrink-0">−</span>
-                <span className="font-[family-name:var(--font-hand)] text-lg text-red/70 line-through">{d.value}</span>
+              <div key={i} className="flex items-center gap-2 py-0.5 bg-danger/5 rounded">
+                <span className="bg-danger/15 text-danger px-1.5 py-0.5 rounded font-mono text-xs shrink-0">−</span>
+                <span className="text-danger line-through">{d.value}</span>
               </div>
             );
           }
           if (d.type === "added") {
             return (
-              <div key={i} className="flex items-center gap-2 py-0.5 bg-green/5 rounded">
-                <span className="bg-green/15 text-green px-1.5 py-0.5 rounded font-mono text-xs shrink-0">+</span>
-                <span className="font-[family-name:var(--font-hand)] text-lg text-green">{d.value}</span>
+              <div key={i} className="flex items-center gap-2 py-0.5 bg-success/5 rounded">
+                <span className="bg-success/15 text-success px-1.5 py-0.5 rounded font-mono text-xs shrink-0">+</span>
+                <span className="text-success">{d.value}</span>
               </div>
             );
           }
@@ -143,7 +143,7 @@ export default function DiffView({ comment, recipe }: DiffViewProps) {
   }
 
   return (
-    <div className="font-[family-name:var(--font-hand)] text-lg text-brown whitespace-pre-wrap">
+    <div className="text-ink whitespace-pre-wrap">
       {comment.body}
     </div>
   );

@@ -24,41 +24,42 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4">
-      <div className="max-w-md w-full text-center">
-        <h1 className="font-[family-name:var(--font-hand)] text-6xl md:text-7xl text-brown mb-2">
-          Carnet de Recettes
+    <main className="flex min-h-screen items-center justify-center px-4">
+      <div className="w-full max-w-md text-center">
+        <h1 className="font-heading mb-2 text-5xl font-semibold text-danger md:text-6xl">
+          Mijoté
         </h1>
-        <p className="font-[family-name:var(--font-hand)] text-2xl text-brown-light mb-10">
+        <p className="mb-10 text-lg text-muted">
           Les recettes de la famille
         </p>
 
-        <div className="bg-white/70 rounded-2xl p-8 shadow-lg border border-cream-dark">
-          <p className="text-sm text-brown-light mb-4">
-            Collez votre lien d&apos;accès ou entrez votre code :
-          </p>
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="rounded-xl border border-line bg-surface p-6 shadow-sm md:p-8">
+          <form onSubmit={handleSubmit} className="space-y-4 text-left">
+            <label htmlFor="token" className="block font-medium">
+              Collez votre lien d&apos;accès ou entrez votre code
+            </label>
             <input
+              id="token"
               type="text"
               value={token}
               onChange={(e) => setToken(e.target.value)}
-              placeholder="Votre code d'accès..."
-              className="input-hand w-full text-center"
+              placeholder="Votre code d'accès"
+              className="field"
               autoFocus
             />
             {error && (
-              <p className="text-red text-sm">{error}</p>
+              <p role="alert" className="text-sm text-danger">{error}</p>
             )}
             <button
               type="submit"
-              className="w-full bg-brown text-cream py-3 rounded-xl font-[family-name:var(--font-hand)] text-xl hover:bg-brown-light transition-colors"
+              className="min-h-12 w-full rounded-lg bg-primary font-semibold text-on-primary transition-colors hover:bg-primary-hover"
             >
               Ouvrir le carnet
             </button>
           </form>
         </div>
 
-        <p className="mt-8 text-xs text-brown-light/60">
+        <p className="mt-8 text-sm text-muted">
           Pas encore de code ? Demandez à un membre de la famille de vous inviter.
         </p>
       </div>

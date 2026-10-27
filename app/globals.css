@@ -1,90 +1,142 @@
 @import "tailwindcss";
 
-@theme {
-  --color-cream: #FFF8F0;
-  --color-cream-dark: #F5E6D3;
-  --color-brown: #3E2723;
-  --color-brown-light: #5D4037;
-  --color-red: #C62828;
-  --color-red-light: #EF5350;
-  --color-green: #2E7D32;
-  --color-green-light: #66BB6A;
-  --color-amber: #F57F17;
-  --font-hand: "Caveat", cursive;
-  --font-body: "Inter", sans-serif;
+/*
+ * Palette : tout passe par ces variables.
+ * Le mode sombre suit automatiquement le réglage de l'appareil.
+ * Contrastes vérifiés (WCAG AA, 4.5:1 pour le texte) dans les deux thèmes.
+ */
+:root {
+  color-scheme: light dark;
+
+  --page: #fff8f0;
+  --surface: #ffffff;
+  --subtle: #f3e6d5;
+  --line: #e6d5c3;
+  --line-strong: #8f7c6a;
+  --ink: #3e2723;
+  --muted: #5d4037;
+
+  --primary: #c62828;
+  --primary-hover: #a81f1f;
+  --on-primary: #ffffff;
+  --danger: #b71c1c;
+  --success: #1b5e20;
+  --success-solid: #2e7d32;
+  --warning: #8a4b00;
+  --note: #fff1c9;
+
+  --photo-a: #f1e3d0;
+  --photo-b: #eadac4;
+
+  /* Couleurs d'encre des membres */
+  --ink-1: #2f4b7c;
+  --ink-2: #256b2a;
+  --ink-3: #8e3b46;
+  --ink-4: #6a4c93;
+  --ink-5: #8a5300;
+  --ink-6: #00695c;
+  --on-ink: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page: #121416;
+    --surface: #1c1f22;
+    --subtle: #2a2e33;
+    --line: #3a4046;
+    --line-strong: #6b737b;
+    --ink: #f2f2f0;
+    --muted: #b8bdc2;
+
+    --primary: #c62828;
+    --primary-hover: #d32f2f;
+    --on-primary: #ffffff;
+    --danger: #ff8a80;
+    --success: #81c995;
+    --success-solid: #2e7d32;
+    --warning: #ffc266;
+    --note: #23282d;
+
+    --photo-a: #2a2e33;
+    --photo-b: #24282c;
+
+    --ink-1: #8ab4f8;
+    --ink-2: #81c995;
+    --ink-3: #f28ba8;
+    --ink-4: #c3a6f0;
+    --ink-5: #f2b56b;
+    --ink-6: #6fd6c8;
+    --on-ink: #121416;
+  }
+}
+
+@theme inline {
+  --color-page: var(--page);
+  --color-surface: var(--surface);
+  --color-subtle: var(--subtle);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-on-primary: var(--on-primary);
+  --color-danger: var(--danger);
+  --color-success: var(--success);
+  --color-success-solid: var(--success-solid);
+  --color-warning: var(--warning);
+  --color-note: var(--note);
+  --color-on-ink: var(--on-ink);
+
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-heading: var(--font-lora), Georgia, serif;
 }
 
 body {
-  background-color: var(--color-cream);
-  color: var(--color-brown);
-  font-family: var(--font-body);
+  background-color: var(--page);
+  color: var(--ink);
+  line-height: 1.5;
 }
 
-/* Notebook lined background — line every 2.5rem (40px) */
-.notebook-bg {
-  --line-height: 2.5rem;
-  background-image:
-    repeating-linear-gradient(
-      transparent,
-      transparent calc(var(--line-height) - 1px),
-      #e8d5c4 calc(var(--line-height) - 1px),
-      #e8d5c4 var(--line-height)
-    );
-  background-size: 100% var(--line-height);
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
-/* Notebook margin line */
-.notebook-margin {
-  border-left: 2px solid #e88b8b;
-  padding-left: 1rem;
+/* Photo absente : rayures discrètes */
+.photo-placeholder {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--photo-a) 0 10px,
+    var(--photo-b) 10px 20px
+  );
 }
 
-/* Notebook text alignment — every element snaps to the line grid */
-.notebook-line {
-  line-height: 2.5rem;
-  padding: 0;
-  margin: 0;
-}
-
-/* Recipe card hover */
-.recipe-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.recipe-card:hover {
-  transform: rotate(0deg) scale(1.02);
-  box-shadow: 0 8px 25px rgba(62, 39, 35, 0.15);
-}
-
-/* Handwritten input style */
-.input-hand {
-  background: transparent;
-  border: none;
-  border-bottom: 1px dashed #a1887f;
-  font-family: var(--font-hand);
-  font-size: 1.25rem;
-  padding: 0;
-  margin: 0;
-  height: 2rem;
-  line-height: 2rem;
-  vertical-align: baseline;
-  outline: none;
-}
-.input-hand:focus {
-  border-bottom-color: var(--color-brown);
-}
-
-.textarea-hand {
-  background: transparent;
-  border: 1px dashed #a1887f;
-  border-radius: 0.5rem;
-  font-family: var(--font-hand);
-  font-size: 1.15rem;
-  padding: 0.75rem;
-  width: 100%;
-  outline: none;
-  resize: vertical;
-  min-height: 120px;
-}
-.textarea-hand:focus {
-  border-color: var(--color-brown);
+/* Champs de formulaire (couche components : les utilitaires Tailwind peuvent les surcharger) */
+@layer components {
+  .field {
+    width: 100%;
+    min-height: 48px;
+    padding: 0 1rem;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1.5px solid var(--line-strong);
+    border-radius: 0.5rem;
+    font: inherit;
+    font-size: 1rem;
+  }
+  textarea.field {
+    min-height: 120px;
+    padding: 0.75rem 1rem;
+    line-height: 1.5;
+    resize: vertical;
+  }
+  .field::placeholder {
+    color: var(--muted);
+  }
+  .field:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 1px var(--primary);
+  }
 }

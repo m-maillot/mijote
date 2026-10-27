@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import IngredientInput from "../recipe/IngredientInput";
 import type { IngredientData } from "../recipe/RecipeForm";
 import DiffView from "./DiffView";
+import { memberInk } from "@/lib/memberInk";
 
 interface Vote {
   memberId: string;
@@ -59,9 +60,9 @@ export default function CommentSection({ recipeId, comments, currentMemberId, re
   };
 
   const statusLabels: Record<string, { label: string; className: string }> = {
-    PENDING: { label: "En attente", className: "bg-amber/20 text-amber" },
-    APPROVED: { label: "Approuvé", className: "bg-green/20 text-green" },
-    REJECTED: { label: "Rejeté", className: "bg-red/20 text-red" },
+    PENDING: { label: "En attente", className: "bg-warning/20 text-warning" },
+    APPROVED: { label: "Approuvé", className: "bg-success/20 text-success" },
+    REJECTED: { label: "Rejeté", className: "bg-danger/20 text-danger" },
   };
 
   function handleFieldChange(newField: string) {
@@ -158,18 +159,19 @@ export default function CommentSection({ recipeId, comments, currentMemberId, re
 
   return (
     <div className="mt-10">
-      <h2 className="font-[family-name:var(--font-hand)] text-3xl text-brown mb-6">
+      <h2 className="font-heading mb-4 text-2xl font-semibold">
         Commentaires & Suggestions
       </h2>
 
       {/* Comment form */}
-      <form onSubmit={handleSubmit} className="bg-white/70 rounded-xl p-5 border border-cream-dark mb-8">
+      <form onSubmit={handleSubmit} className="bg-surface rounded-xl p-5 border border-line mb-8">
         <div className="mb-3">
-          <label className="text-sm text-brown-light block mb-1">Type de commentaire</label>
+          <label htmlFor="comment-type" className="text-sm font-medium block mb-1">Type de commentaire</label>
           <select
+            id="comment-type"
             value={field}
             onChange={(e) => handleFieldChange(e.target.value)}
-            className="bg-transparent border border-cream-dark rounded-lg px-3 py-2 text-sm text-brown w-full"
+            className="field"
           >
             {Object.entries(fieldLabels).map(([key, label]) => (
               <option key={key} value={key}>{label}</option>
@@ -178,14 +180,14 @@ export default function CommentSection({ recipeId, comments, currentMemberId, re
         </div>
 
         {field !== "GENERAL" && field !== "INGREDIENTS" && (
-          <p className="text-xs text-brown-light/70 mb-2">
+          <p className="text-sm text-muted mb-2">
             Modifiez le texte ci-dessous avec votre suggestion. Si elle est approuvée par 2 membres, la recette sera mise à jour.
           </p>
         )}
 
         {field === "INGREDIENTS" ? (
           <div className="mb-3">
-            <p className="text-xs text-brown-light/70 mb-3">
+            <p className="text-sm text-muted mb-3">
               Modifiez les ingrédients ci-dessous. Si votre suggestion est approuvée par 2 membres, la recette sera mise à jour.
             </p>
             <div className="space-y-2">
@@ -205,7 +207,7 @@ export default function CommentSection({ recipeId, comments, currentMemberId, re
             <button
               type="button"
               onClick={addSuggestedIngredient}
-              className="mt-2 text-brown-light hover:text-brown font-[family-name:var(--font-hand)] text-lg transition-colors flex items-center gap-1"
+              className="mt-2 flex min-h-11 items-center gap-1 font-medium text-muted transition-colors hover:text-ink"
             >
               <span className="text-xl">+</span> Ajouter un ingrédient
             </button>
@@ -214,7 +216,7 @@ export default function CommentSection({ recipeId, comments, currentMemberId, re
           <textarea
             value={body}
             onChange={(e) => setBody(e.target.value)}
-            className="textarea-hand mb-3"
+            className="field mb-3"
             placeholder={field === "GENERAL" ? "Un commentaire, une astuce, un souvenir..." : "Votre suggestion..."}
             rows={4}
             required={field !== "INGREDIENTS"}
@@ -224,7 +226,7 @@ export default function CommentSection({ recipeId, comments, currentMemberId, re
         <button
           type="submit"
           disabled={submitting}
-          className="bg-brown text-cream px-6 py-2 rounded-xl font-[family-name:var(--font-hand)] text-lg hover:bg-brown-light transition-colors disabled:opacity-50"
+          className="min-h-12 rounded-lg bg-primary px-6 font-semibold text-on-primary transition-colors hover:bg-primary-hover disabled:opacity-50"
         >
           {submitting ? "Envoi..." : "Envoyer"}
         </button>
@@ -232,7 +234,7 @@ export default function CommentSection({ recipeId, comments, currentMemberId, re
 
       {/* Comments list */}
       {comments.length === 0 ? (
-        <p className="text-brown-light text-center py-4">Aucun commentaire pour le moment</p>
+        <p className="text-muted text-center py-4">Aucun commentaire pour le moment</p>
       ) : (
         <div className="space-y-4">
           {comments.map((comment) => {
@@ -245,14 +247,14 @@ export default function CommentSection({ recipeId, comments, currentMemberId, re
             return (
               <div
                 key={comment.id}
-                className="bg-white/60 rounded-xl p-4 border border-cream-dark"
+                className="bg-surface rounded-xl p-4 border border-line"
               >
                 <div className="flex items-start justify-between mb-2 flex-wrap gap-2">
                   <div>
-                    <span className="font-[family-name:var(--font-hand)] text-lg text-brown">
+                    <span className="font-semibold" style={{ color: memberInk(comment.author.name) }}>
                       {comment.author.name}
                     </span>
-                    <span className="text-xs text-brown-light ml-2">
+                    <span className="ml-2 text-sm text-muted">
                       {new Date(comment.createdAt).toLocaleDateString("fr-FR", {
                         day: "numeric",
                         month: "long",
@@ -260,10 +262,10 @@ export default function CommentSection({ recipeId, comments, currentMemberId, re
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-cream-dark text-brown-light">
+                    <span className="text-sm px-2.5 py-0.5 rounded-full bg-subtle text-muted">
                       {fieldLabels[comment.field]}
                     </span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${status.className}`}>
+                    <span className={`text-sm px-2.5 py-0.5 rounded-full ${status.className}`}>
                       {status.label}
                     </span>
                   </div>
@@ -279,10 +281,10 @@ export default function CommentSection({ recipeId, comments, currentMemberId, re
                         <button
                           onClick={() => handleVote(comment.id, true)}
                           disabled={myVote?.approve === true}
-                          className={`flex items-center gap-1 px-3 py-1 rounded-lg transition-colors ${
+                          className={`flex min-h-11 items-center gap-1 rounded-lg px-4 font-medium transition-colors ${
                             myVote?.approve === true
-                              ? "bg-green/20 text-green"
-                              : "bg-cream-dark text-brown-light hover:bg-green/20 hover:text-green"
+                              ? "bg-success/20 text-success"
+                              : "bg-subtle text-muted hover:bg-success/20 hover:text-success"
                           }`}
                         >
                           Approuver ({approves})
@@ -290,10 +292,10 @@ export default function CommentSection({ recipeId, comments, currentMemberId, re
                         <button
                           onClick={() => handleVote(comment.id, false)}
                           disabled={myVote?.approve === false}
-                          className={`flex items-center gap-1 px-3 py-1 rounded-lg transition-colors ${
+                          className={`flex min-h-11 items-center gap-1 rounded-lg px-4 font-medium transition-colors ${
                             myVote?.approve === false
-                              ? "bg-red/20 text-red"
-                              : "bg-cream-dark text-brown-light hover:bg-red/20 hover:text-red"
+                              ? "bg-danger/20 text-danger"
+                              : "bg-subtle text-muted hover:bg-danger/20 hover:text-danger"
                           }`}
                         >
                           Rejeter ({rejects})
@@ -301,7 +303,7 @@ export default function CommentSection({ recipeId, comments, currentMemberId, re
                       </>
                     )}
                     {isAuthor && (
-                      <span className="text-brown-light/60">
+                      <span className="text-muted">
                         Approuvé par {approves} personne{approves > 1 ? "s" : ""}
                       </span>
                     )}

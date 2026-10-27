@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { memberInk } from "@/lib/memberInk";
 
 interface Member {
   id: string;
@@ -75,37 +76,39 @@ export default function FamillePage() {
 
   return (
     <div>
-      <h1 className="font-[family-name:var(--font-hand)] text-4xl text-brown mb-8">
+      <h1 className="font-heading mb-6 text-3xl font-semibold md:text-4xl">
         La famille
       </h1>
 
       {/* Invite form */}
-      <div className="bg-white/70 rounded-xl p-5 border border-cream-dark mb-8 max-w-lg">
-        <h2 className="font-[family-name:var(--font-hand)] text-2xl text-brown mb-3">
+      <div className="bg-surface rounded-xl p-5 border border-line mb-8 max-w-lg">
+        <h2 className="font-heading mb-3 text-xl font-semibold">
           Inviter un membre
         </h2>
         <form onSubmit={handleInvite} className="space-y-3">
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="input-hand flex-1"
-              placeholder="Prénom..."
+              className="field flex-1"
+              placeholder="Prénom"
+              aria-label="Prénom"
               required
             />
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="input-hand flex-1"
+              className="field flex-1"
               placeholder="Email (optionnel)"
+              aria-label="Email (optionnel)"
             />
           </div>
           <button
             type="submit"
             disabled={creating}
-            className="bg-brown text-cream px-5 py-2 rounded-xl font-[family-name:var(--font-hand)] text-lg hover:bg-brown-light transition-colors disabled:opacity-50 whitespace-nowrap"
+            className="min-h-12 whitespace-nowrap rounded-lg bg-primary px-6 font-semibold text-on-primary transition-colors hover:bg-primary-hover disabled:opacity-50"
           >
             Inviter
           </button>
@@ -117,20 +120,20 @@ export default function FamillePage() {
         {members.map((m) => (
           <div
             key={m.id}
-            className="bg-white/60 rounded-xl p-4 border border-cream-dark"
+            className="bg-surface rounded-xl p-4 border border-line"
           >
-            <div className="flex items-center justify-between mb-2">
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <p className="font-[family-name:var(--font-hand)] text-2xl text-brown">
+                <p className="font-heading text-xl font-semibold" style={{ color: memberInk(m.name) }}>
                   {m.name}
                 </p>
                 {m.isAdmin && (
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-amber/20 text-amber">
+                  <span className="text-sm px-2.5 py-0.5 rounded-full bg-warning/20 text-warning">
                     Admin
                   </span>
                 )}
               </div>
-              <p className="text-xs text-brown-light">
+              <p className="text-sm text-muted">
                 {m._count.recipes} recette{m._count.recipes > 1 ? "s" : ""}
                 {" "}&middot;{" "}
                 Membre depuis {new Date(m.createdAt).toLocaleDateString("fr-FR", { month: "long", year: "numeric" })}
@@ -145,31 +148,32 @@ export default function FamillePage() {
                     type="email"
                     value={editEmailValue}
                     onChange={(e) => setEditEmailValue(e.target.value)}
-                    className="text-sm bg-white/80 rounded-lg px-3 py-1 flex-1 border border-cream-dark outline-none"
+                    className="field flex-1 text-sm"
                     placeholder="email@exemple.fr"
+                    aria-label="Email"
                     autoFocus
                   />
                   <button
                     onClick={() => handleSaveEmail(m.id)}
-                    className="text-xs bg-green text-cream px-3 py-1 rounded-lg hover:bg-green-light transition-colors"
+                    className="min-h-11 rounded-lg bg-success-solid px-4 text-sm font-semibold text-on-primary transition-colors hover:opacity-90"
                   >
                     Enregistrer
                   </button>
                   <button
                     onClick={() => setEditingEmail(null)}
-                    className="text-xs text-brown-light hover:text-brown transition-colors"
+                    className="min-h-11 px-2 text-sm text-muted transition-colors hover:text-ink"
                   >
                     Annuler
                   </button>
                 </>
               ) : (
                 <>
-                  <span className="text-sm text-brown-light">
+                  <span className="text-sm text-muted">
                     {m.email || "Pas d'email"}
                   </span>
                   <button
                     onClick={() => { setEditingEmail(m.id); setEditEmailValue(m.email || ""); }}
-                    className="text-xs text-brown-light hover:text-brown transition-colors underline"
+                    className="min-h-11 px-2 text-sm text-muted underline transition-colors hover:text-ink"
                   >
                     {m.email ? "Modifier" : "Ajouter"}
                   </button>
@@ -183,12 +187,13 @@ export default function FamillePage() {
                 type="text"
                 readOnly
                 value={getLink(m.token)}
-                className="text-xs bg-cream/80 rounded-lg px-3 py-1.5 flex-1 select-all text-brown-light border border-cream-dark"
+                className="field flex-1 select-all text-sm text-muted"
+                aria-label={`Lien de connexion de ${m.name}`}
                 onClick={(e) => (e.target as HTMLInputElement).select()}
               />
               <button
                 onClick={() => copyLink(m.token)}
-                className="text-xs bg-brown text-cream px-3 py-1.5 rounded-lg hover:bg-brown-light transition-colors whitespace-nowrap"
+                className="min-h-12 whitespace-nowrap rounded-lg bg-primary px-4 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-hover"
               >
                 Copier
               </button>

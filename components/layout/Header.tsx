@@ -1,4 +1,7 @@
 import Link from "next/link";
+import NavLinks from "./NavLinks";
+import Avatar from "@/components/ui/Avatar";
+import { memberInk } from "@/lib/memberInk";
 
 interface HeaderProps {
   memberName: string;
@@ -7,27 +10,18 @@ interface HeaderProps {
 
 export default function Header({ memberName, isAdmin }: HeaderProps) {
   return (
-    <header className="bg-white/60 border-b border-cream-dark sticky top-0 z-50 backdrop-blur-sm">
-      <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-        <Link href="/recettes" className="font-[family-name:var(--font-hand)] text-3xl text-brown hover:text-brown-light transition-colors">
-          Carnet de Recettes
+    <header className="sticky top-0 z-40 border-b border-line bg-page/95 backdrop-blur-sm">
+      <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
+        <Link href="/recettes" className="font-heading text-3xl font-semibold text-danger">
+          Mijoté
         </Link>
-        <nav className="flex items-center gap-4 text-sm">
-          <Link href="/recettes" className="text-brown-light hover:text-brown transition-colors">
-            Recettes
-          </Link>
-          <Link href="/recettes/nouveau" className="text-brown-light hover:text-brown transition-colors">
-            + Ajouter
-          </Link>
-          {isAdmin && (
-            <Link href="/famille" className="text-brown-light hover:text-brown transition-colors">
-              Famille
-            </Link>
-          )}
-          <span className="font-[family-name:var(--font-hand)] text-lg text-brown ml-2">
-            {memberName}
+        <div className="flex items-center gap-6">
+          <NavLinks isAdmin={isAdmin} />
+          <span className="flex items-center gap-2 font-medium" style={{ color: memberInk(memberName) }}>
+            <Avatar name={memberName} size={36} />
+            <span className="hidden sm:inline">{memberName}</span>
           </span>
-        </nav>
+        </div>
       </div>
     </header>
   );

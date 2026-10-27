@@ -21,7 +21,7 @@ export default async function ModifierPage({
 
   return (
     <div>
-      <h1 className="font-[family-name:var(--font-hand)] text-4xl text-brown mb-8">
+      <h1 className="font-heading mb-6 text-3xl font-semibold md:text-4xl">
         Modifier la recette
       </h1>
       <RecipeForm

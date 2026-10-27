@@ -19,9 +19,9 @@ export default async function FamilleLayout({
   if (!member.isAdmin) redirect("/recettes");
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-page">
       <Header memberName={member.name} isAdmin={member.isAdmin} />
-      <main className="max-w-5xl mx-auto px-4 py-6">
+      <main className="mx-auto max-w-5xl px-4 pb-24 pt-6 md:pb-10">
         {children}
       </main>
     </div>

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { memberInk } from "@/lib/memberInk";
 
 export default async function RecettesPage() {
   const recipes = await prisma.recipe.findMany({
@@ -13,62 +14,68 @@ export default async function RecettesPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="font-[family-name:var(--font-hand)] text-4xl text-brown">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <h1 className="font-heading text-3xl font-semibold md:text-4xl">
           Toutes les recettes
         </h1>
         <Link
           href="/recettes/nouveau"
-          className="bg-brown text-cream px-5 py-2 rounded-xl font-[family-name:var(--font-hand)] text-xl hover:bg-brown-light transition-colors"
+          className="inline-flex min-h-12 items-center rounded-lg bg-primary px-5 font-semibold text-on-primary transition-colors hover:bg-primary-hover"
         >
           + Nouvelle recette
         </Link>
       </div>
 
       {recipes.length === 0 ? (
-        <div className="text-center py-20">
-          <p className="font-[family-name:var(--font-hand)] text-3xl text-brown-light mb-4">
-            Le carnet est vide...
+        <div className="py-20 text-center">
+          <p className="font-heading mb-4 text-2xl font-semibold text-muted">
+            Le carnet est vide
           </p>
-          <p className="text-brown-light">
+          <p className="text-muted">
             Soyez le premier à ajouter une recette de famille !
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {recipes.map((recipe, i) => (
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6">
+          {recipes.map((recipe) => (
             <Link
               key={recipe.id}
               href={`/recettes/${recipe.id}`}
-              className="recipe-card bg-white/80 rounded-xl p-5 shadow-md border border-cream-dark block"
-              style={{ transform: `rotate(${(i % 3 - 1) * 0.8}deg)` }}
+              className="block overflow-hidden rounded-xl border border-line bg-surface transition-shadow hover:shadow-lg"
             >
-              {recipe.photos[0] && (
-                <div className="mb-3 rounded-lg overflow-hidden h-40 bg-cream-dark">
+              <div className="photo-placeholder h-28 md:h-40">
+                {recipe.photos[0] && (
                   <img
                     src={`/api/photos/${recipe.photos[0].filename}`}
                     alt={recipe.title}
-                    className="w-full h-full object-cover"
+                    className="h-full w-full object-cover"
                   />
-                </div>
-              )}
-              <h2 className="font-[family-name:var(--font-hand)] text-2xl text-brown mb-1">
-                {recipe.title}
-              </h2>
-              <p className="text-sm text-brown-light">
-                par {recipe.author.name}
-              </p>
-              <div className="mt-3 flex items-center justify-between text-xs text-brown-light/70">
-                <span>
-                  {new Date(recipe.createdAt).toLocaleDateString("fr-FR", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </span>
-                {recipe._count.comments > 0 && (
-                  <span>{recipe._count.comments} commentaire{recipe._count.comments > 1 ? "s" : ""}</span>
                 )}
+              </div>
+              <div className="p-3 md:p-4">
+                <h2 className="font-heading text-base font-semibold leading-snug md:text-xl">
+                  {recipe.title}
+                </h2>
+                <p
+                  className="text-sm font-medium"
+                  style={{ color: memberInk(recipe.author.name) }}
+                >
+                  par {recipe.author.name}
+                </p>
+                <div className="mt-2 flex flex-wrap items-center justify-between gap-x-3 text-sm text-muted">
+                  <span>
+                    {new Date(recipe.createdAt).toLocaleDateString("fr-FR", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </span>
+                  {recipe._count.comments > 0 && (
+                    <span>
+                      {recipe._count.comments} commentaire{recipe._count.comments > 1 ? "s" : ""}
+                    </span>
+                  )}
+                </div>
               </div>
             </Link>
           ))}

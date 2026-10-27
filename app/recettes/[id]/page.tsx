@@ -3,6 +3,9 @@ import { getMemberFromCookie } from "@/lib/auth";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import CommentSection from "@/components/comment/CommentSection";
+import IngredientList from "@/components/recipe/IngredientList";
+import Avatar from "@/components/ui/Avatar";
+import { memberInk } from "@/lib/memberInk";
 
 export default async function RecipeDetailPage({
   params,
@@ -35,25 +38,28 @@ export default async function RecipeDetailPage({
   const steps = recipe.steps.split("\n").filter(Boolean);
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="mx-auto max-w-4xl">
       {recipe.photos.length > 0 && (
-        <div className="mb-6 rounded-xl overflow-hidden">
+        <div className="mb-6 overflow-hidden rounded-xl">
           <img
             src={`/api/photos/${recipe.photos[0].filename}`}
             alt={recipe.title}
-            className="w-full max-h-80 object-cover"
+            className="max-h-80 w-full object-cover"
           />
         </div>
       )}
 
-      <div className="flex items-start justify-between mb-6">
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="font-[family-name:var(--font-hand)] text-5xl text-brown mb-2">
+          <h1 className="font-heading mb-2 text-3xl font-semibold leading-tight md:text-5xl">
             {recipe.title}
           </h1>
-          <p className="text-brown-light">
-            par <span className="font-[family-name:var(--font-hand)] text-xl">{recipe.author.name}</span>
-            {" "}&middot;{" "}
+          <p className="flex flex-wrap items-center gap-2 text-muted">
+            <Avatar name={recipe.author.name} size={28} />
+            <span className="font-medium" style={{ color: memberInk(recipe.author.name) }}>
+              {recipe.author.name}
+            </span>
+            <span aria-hidden="true">&middot;</span>
             {new Date(recipe.createdAt).toLocaleDateString("fr-FR", {
               day: "numeric",
               month: "long",
@@ -64,46 +70,46 @@ export default async function RecipeDetailPage({
         {isAuthor && (
           <Link
             href={`/recettes/${recipe.id}/modifier`}
-            className="bg-cream-dark text-brown px-4 py-2 rounded-xl font-[family-name:var(--font-hand)] text-lg hover:bg-brown hover:text-cream transition-colors"
+            className="inline-flex min-h-12 items-center rounded-lg border-[1.5px] border-ink px-5 font-semibold transition-colors hover:bg-ink hover:text-page"
           >
             Modifier
           </Link>
         )}
       </div>
 
-      <div className="notebook-bg rounded-xl bg-white/50 border border-cream-dark" style={{ paddingTop: "0.75rem", paddingBottom: "0.75rem", paddingLeft: "1.5rem", paddingRight: "1.5rem", backgroundPositionY: "calc(0.75rem + 2rem)" }}>
-        <div className="notebook-margin">
-          <h2 className="notebook-line font-[family-name:var(--font-hand)] text-3xl text-red" style={{ lineHeight: "2.5rem" }}>
+      <div className="grid gap-8 border-t border-line pt-6 md:grid-cols-[minmax(0,320px)_1fr] md:gap-12">
+        <section aria-labelledby="ingredients-title">
+          <h2 id="ingredients-title" className="font-heading mb-3 text-2xl font-semibold">
             Ingrédients
           </h2>
-          <ul>
-            {recipe.ingredients.map((ing) => (
-              <li key={ing.id} className="notebook-line font-[family-name:var(--font-hand)] text-xl text-brown flex items-baseline gap-2" style={{ lineHeight: "2.5rem" }}>
-                <span className="text-red">*</span>
-                <span>
-                  {ing.quantity && <span className="font-semibold">{ing.quantity}</span>}
-                  {ing.unit && <span className="text-brown-light"> {ing.unit}</span>}
-                  {(ing.quantity || ing.unit) && " "}
-                  {ing.name}
-                </span>
-              </li>
-            ))}
-          </ul>
+          <IngredientList
+            ingredients={recipe.ingredients.map((i) => ({
+              id: i.id,
+              quantity: i.quantity,
+              unit: i.unit,
+              name: i.name,
+            }))}
+          />
+        </section>
 
-          <h2 className="notebook-line font-[family-name:var(--font-hand)] text-3xl text-red mt-[2.5rem]" style={{ lineHeight: "2.5rem" }}>
+        <section aria-labelledby="steps-title">
+          <h2 id="steps-title" className="font-heading mb-3 text-2xl font-semibold">
             Préparation
           </h2>
           <ol>
             {steps.map((step, i) => (
-              <li key={i} className="notebook-line font-[family-name:var(--font-hand)] text-xl text-brown flex items-baseline gap-3" style={{ lineHeight: "2.5rem" }}>
-                <span className="font-[family-name:var(--font-hand)] text-2xl text-red font-bold min-w-[2rem]">
-                  {i + 1}.
+              <li key={i} className="flex gap-4 border-b border-line py-3">
+                <span
+                  aria-hidden="true"
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink font-semibold text-page"
+                >
+                  {i + 1}
                 </span>
                 <span>{step}</span>
               </li>
             ))}
           </ol>
-        </div>
+        </section>
       </div>
 
       <CommentSection
