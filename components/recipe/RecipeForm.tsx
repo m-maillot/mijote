@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import IngredientInput from "./IngredientInput";
+import PhotoImportButton from "./PhotoImportButton";
 
 export interface IngredientData {
   quantity: string;
@@ -30,6 +31,7 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
   const [servings, setServings] = useState(String(initialData?.servings ?? 4));
   const [photo, setPhoto] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
+  const [importWarnings, setImportWarnings] = useState<string[] | null>(null);
 
   const isEdit = !!initialData;
 
@@ -54,6 +56,19 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
     const updated = [...ingredients];
     [updated[index], updated[newIndex]] = [updated[newIndex], updated[index]];
     setIngredients(updated);
+  }
+
+  function applyImport(
+    recipe: { title: string; servings: number; ingredients: IngredientData[]; steps: string },
+    warnings: string[],
+    file: File
+  ) {
+    setTitle(recipe.title);
+    setServings(String(recipe.servings));
+    setIngredients(recipe.ingredients.length ? recipe.ingredients : [{ quantity: "", unit: "", name: "" }]);
+    setSteps(recipe.steps);
+    setPhoto(file);
+    setImportWarnings(warnings);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -102,7 +117,21 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
   }
 
   return (
+    <>
+    {!isEdit && <PhotoImportButton onImported={applyImport} />}
     <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
+      {importWarnings && (
+        <div role="status" className="rounded-lg border border-line-strong bg-subtle p-4 text-sm">
+          <p className="font-semibold">Vérifiez les quantités avant d&apos;enregistrer.</p>
+          {importWarnings.length > 0 && (
+            <ul className="mt-1 list-disc pl-5 text-muted">
+              {importWarnings.map((w, i) => (
+                <li key={i}>{w}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
       <div>
         <label htmlFor="title" className="font-heading text-xl font-semibold block mb-2">
           Titre de la recette
@@ -190,6 +219,9 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
             onChange={(e) => setPhoto(e.target.files?.[0] ?? null)}
             className="text-sm text-muted file:mr-4 file:py-2 file:px-4 file:min-h-11 file:rounded-lg file:border-0 file:bg-subtle file:font-medium file:text-ink file:cursor-pointer hover:file:bg-ink hover:file:text-page"
           />
+          {photo && (
+            <p className="mt-2 text-sm text-muted">Photo jointe : {photo.name}</p>
+          )}
         </div>
       )}
 
@@ -201,5 +233,6 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
         {saving ? "Enregistrement..." : isEdit ? "Mettre à jour" : "Ajouter la recette"}
       </button>
     </form>
+    </>
   );
 }

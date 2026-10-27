@@ -19,6 +19,7 @@ model Member {
   votes       CommentVote[]
   sessions    Session[]
   loginTokens LoginToken[]
+  imports     RecipeImport[]
 }
 
 // Seuls les hash sont stockés : un dump de la base ne permet pas de se connecter.
@@ -115,4 +116,27 @@ model CommentVote {
   member  Member  @relation(fields: [memberId], references: [id])
 
   @@unique([commentId, memberId])
+}
+
+enum ImportStatus {
+  PENDING   // créneau réservé, appel en cours
+  SUCCESS
+  NO_RECIPE // l'API a répondu, aucune recette détectée (compte dans le quota)
+  FAILED    // erreur Anthropic : créneau restitué (non compté)
+}
+
+// Journal des imports de recette par photo : sert au quota quotidien et au suivi des coûts.
+model RecipeImport {
+  id           String       @id @default(uuid())
+  memberId     String
+  day          String // "YYYY-MM-DD" en Europe/Paris
+  status       ImportStatus @default(PENDING)
+  imageCount   Int
+  inputTokens  Int?
+  outputTokens Int?
+  createdAt    DateTime     @default(now())
+
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@index([memberId, day])
 }

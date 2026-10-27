@@ -61,7 +61,13 @@ SMTP_PORT="587"
 SMTP_USER="..."
 SMTP_PASS="..."
 SMTP_FROM="Carnet de Recettes <recettes@ludlows.fr>"
+# Import de recette par photo (optionnel ; sans clé, le bouton est masqué)
+ANTHROPIC_API_KEY="..."
+ANTHROPIC_MODEL="claude-sonnet-5-5"
+IMPORT_DAILY_LIMIT=20
 ```
+
+Les photos importées sont envoyées à l'API Anthropic pour lecture et ne sont pas stockées par l'app, sauf la première si la recette est validée. Pense à fixer une limite de dépense mensuelle dans la console Anthropic.
 
 ```bash
 chmod 600 /opt/mijote/.env

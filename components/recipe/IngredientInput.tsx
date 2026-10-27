@@ -64,7 +64,7 @@ export default function IngredientInput({
           className="field w-28 shrink-0 px-2"
           aria-label="Unité"
         >
-          {COMMON_UNITS.map((u) => (
+          {(COMMON_UNITS.includes(ingredient.unit) ? COMMON_UNITS : [...COMMON_UNITS, ingredient.unit]).map((u) => (
             <option key={u} value={u}>
               {u || "—"}
             </option>
