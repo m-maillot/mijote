@@ -32,12 +32,14 @@ export default function IngredientList({ ingredients }: { ingredients: Ingredien
                 type="checkbox"
                 checked={done}
                 onChange={() => toggle(ing.id)}
-                className="h-5 w-5 shrink-0 accent-[var(--primary)]"
+                className="h-[22px] w-[22px] shrink-0 accent-[var(--ink)]"
               />
               <span className={done ? "text-muted line-through" : ""}>
-                {ing.quantity && <span className="font-semibold">{ing.quantity}</span>}
-                {ing.unit && <span> {ing.unit}</span>}
-                {(ing.quantity || ing.unit) && " "}
+                {(ing.quantity || ing.unit) && (
+                  <span className="mr-1 inline-block min-w-14 font-semibold">
+                    {[ing.quantity, ing.unit].filter(Boolean).join(" ")}
+                  </span>
+                )}
                 {ing.name}
               </span>
             </label>

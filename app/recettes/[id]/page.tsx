@@ -37,98 +37,113 @@ export default async function RecipeDetailPage({
   const isAuthor = recipe.authorId === member.id;
   const steps = recipe.steps.split("\n").filter(Boolean);
 
-  return (
-    <div className="mx-auto max-w-4xl">
-      {recipe.photos.length > 0 && (
-        <div className="mb-6 overflow-hidden rounded-xl">
-          <img
-            src={`/api/photos/${recipe.photos[0].filename}`}
-            alt={recipe.title}
-            className="max-h-80 w-full object-cover"
-          />
-        </div>
-      )}
+  const date = new Date(recipe.createdAt).toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="font-heading mb-2 text-3xl font-semibold leading-tight md:text-5xl">
-            {recipe.title}
-          </h1>
-          <p className="flex flex-wrap items-center gap-2 text-muted">
-            <Avatar name={recipe.author.name} size={28} />
-            <span className="font-medium" style={{ color: memberInk(recipe.author.name) }}>
-              {recipe.author.name}
-            </span>
-            <span aria-hidden="true">&middot;</span>
-            {new Date(recipe.createdAt).toLocaleDateString("fr-FR", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}
-          </p>
-        </div>
+  return (
+    <div className="mx-auto max-w-[1040px]">
+      <div className="mb-4 flex items-center justify-between">
+        <Link
+          href="/recettes"
+          className="inline-flex min-h-11 items-center gap-1.5 font-semibold text-danger"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M15 5l-7 7 7 7" />
+          </svg>
+          <span className="md:hidden">Recettes</span>
+          <span className="hidden md:inline">Toutes les recettes</span>
+        </Link>
         {isAuthor && (
           <Link
             href={`/recettes/${recipe.id}/modifier`}
-            className="inline-flex min-h-12 items-center rounded-lg border-[1.5px] border-ink px-5 font-semibold transition-colors hover:bg-ink hover:text-page"
+            className="inline-flex min-h-11 items-center font-semibold underline md:rounded-lg md:border-[1.5px] md:border-ink md:px-[18px] md:no-underline"
           >
             Modifier
           </Link>
         )}
       </div>
 
-      <div className="grid gap-8 border-t border-line pt-6 md:grid-cols-[minmax(0,320px)_1fr] md:gap-12">
-        <section aria-labelledby="ingredients-title">
-          <h2 id="ingredients-title" className="font-heading mb-3 text-2xl font-semibold">
-            Ingrédients
-          </h2>
-          <IngredientList
-            ingredients={recipe.ingredients.map((i) => ({
-              id: i.id,
+      <h1 className="font-heading text-[34px] font-semibold leading-10 md:text-[52px] md:leading-[60px]">
+        {recipe.title}
+      </h1>
+      <div
+        className="mt-2 flex items-center gap-2.5 font-medium"
+        style={{ color: memberInk(recipe.author.name) }}
+      >
+        <Avatar name={recipe.author.name} size={28} />
+        Recette de {recipe.author.name}
+      </div>
+
+      <div className="mt-6 border-y border-line py-4 text-muted">Ajoutée le {date}</div>
+
+      <div className="mt-8 flex flex-wrap items-start gap-x-12 gap-y-8">
+        <div className="flex min-w-0 flex-[1_1_300px] flex-col gap-8 md:max-w-[380px]">
+          <div className="photo-placeholder h-[190px] overflow-hidden rounded-[10px] md:h-[260px]">
+            {recipe.photos.length > 0 && (
+              <img
+                src={`/api/photos/${recipe.photos[0].filename}`}
+                alt={recipe.title}
+                className="h-full w-full object-cover"
+              />
+            )}
+          </div>
+          <section aria-labelledby="ingredients-title">
+            <h2 id="ingredients-title" className="font-heading mb-3 text-2xl font-semibold md:text-[26px]">
+              Ingrédients
+            </h2>
+            <IngredientList
+              ingredients={recipe.ingredients.map((i) => ({
+                id: i.id,
+                quantity: i.quantity,
+                unit: i.unit,
+                name: i.name,
+              }))}
+            />
+          </section>
+        </div>
+
+        <div className="min-w-0 flex-[2_1_420px]">
+          <section aria-labelledby="steps-title">
+            <h2 id="steps-title" className="font-heading mb-3 text-2xl font-semibold md:text-[26px]">
+              Préparation
+            </h2>
+            <ol>
+              {steps.map((step, i) => (
+                <li key={i} className="flex gap-4 border-b border-line py-3">
+                  <span
+                    aria-hidden="true"
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink font-semibold text-page"
+                  >
+                    {i + 1}
+                  </span>
+                  <span>{step}</span>
+                </li>
+              ))}
+            </ol>
+          </section>
+
+        <CommentSection
+          recipeId={recipe.id}
+          comments={recipe.comments.map((c) => ({
+            ...c,
+            createdAt: c.createdAt.toISOString(),
+          }))}
+          currentMemberId={member.id}
+          recipe={{
+            title: recipe.title,
+            ingredients: recipe.ingredients.map((i) => ({
               quantity: i.quantity,
               unit: i.unit,
               name: i.name,
-            }))}
-          />
-        </section>
-
-        <section aria-labelledby="steps-title">
-          <h2 id="steps-title" className="font-heading mb-3 text-2xl font-semibold">
-            Préparation
-          </h2>
-          <ol>
-            {steps.map((step, i) => (
-              <li key={i} className="flex gap-4 border-b border-line py-3">
-                <span
-                  aria-hidden="true"
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink font-semibold text-page"
-                >
-                  {i + 1}
-                </span>
-                <span>{step}</span>
-              </li>
-            ))}
-          </ol>
-        </section>
+            })),
+            steps: recipe.steps,
+          }}
+        />
+        </div>
       </div>
-
-      <CommentSection
-        recipeId={recipe.id}
-        comments={recipe.comments.map((c) => ({
-          ...c,
-          createdAt: c.createdAt.toISOString(),
-        }))}
-        currentMemberId={member.id}
-        recipe={{
-          title: recipe.title,
-          ingredients: recipe.ingredients.map((i) => ({
-            quantity: i.quantity,
-            unit: i.unit,
-            name: i.name,
-          })),
-          steps: recipe.steps,
-        }}
-      />
     </div>
   );
 }
