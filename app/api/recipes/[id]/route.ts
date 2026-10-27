@@ -47,7 +47,8 @@ export async function PATCH(
     return NextResponse.json({ error: "Seul l'auteur peut modifier" }, { status: 403 });
   }
 
-  const { title, ingredients, steps } = await request.json();
+  const { title, ingredients, steps, servings } = await request.json();
+  const servingsCount = Math.round(Number(servings));
 
   const updated = await prisma.$transaction(async (tx) => {
     if (ingredients) {
@@ -68,6 +69,7 @@ export async function PATCH(
       data: {
         ...(title && { title: title.trim() }),
         ...(steps && { steps: steps.trim() }),
+        ...(servingsCount >= 1 && servingsCount <= 100 && { servings: servingsCount }),
       },
       include: { ingredients: { orderBy: { order: "asc" } } },
     });

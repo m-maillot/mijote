@@ -16,6 +16,7 @@ interface RecipeFormProps {
     title: string;
     ingredients: IngredientData[];
     steps: string;
+    servings: number;
   };
 }
 
@@ -26,6 +27,7 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
     initialData?.ingredients ?? [{ quantity: "", unit: "", name: "" }]
   );
   const [steps, setSteps] = useState(initialData?.steps ?? "");
+  const [servings, setServings] = useState(String(initialData?.servings ?? 4));
   const [photo, setPhoto] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -74,6 +76,7 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
           title,
           ingredients: validIngredients.map((ing, i) => ({ ...ing, order: i })),
           steps,
+          servings: Number(servings) || 4,
         }),
       });
 
@@ -111,6 +114,23 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
           onChange={(e) => setTitle(e.target.value)}
           className="field text-lg"
           placeholder="Ex: Gratin dauphinois de Mamie..."
+          required
+        />
+      </div>
+
+      <div>
+        <label htmlFor="servings" className="font-heading text-xl font-semibold block mb-2">
+          Nombre de personnes
+        </label>
+        <input
+          id="servings"
+          type="number"
+          inputMode="numeric"
+          min={1}
+          max={100}
+          value={servings}
+          onChange={(e) => setServings(e.target.value)}
+          className="field w-28"
           required
         />
       </div>

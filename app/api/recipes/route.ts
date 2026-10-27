@@ -3,6 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { getMemberFromRequest } from "@/lib/auth";
 import { notifyNewRecipe } from "@/lib/email";
 
+function parseServings(value: unknown) {
+  const n = Math.round(Number(value));
+  return Number.isFinite(n) && n >= 1 && n <= 100 ? n : 4;
+}
+
 export async function GET(request: NextRequest) {
   const member = await getMemberFromRequest(request);
   if (!member) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -28,7 +33,7 @@ export async function POST(request: NextRequest) {
   const member = await getMemberFromRequest(request);
   if (!member) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
-  const { title, ingredients, steps } = await request.json();
+  const { title, ingredients, steps, servings } = await request.json();
 
   if (!title?.trim() || !steps?.trim() || !ingredients?.length) {
     return NextResponse.json({ error: "Tous les champs sont requis" }, { status: 400 });
@@ -38,6 +43,7 @@ export async function POST(request: NextRequest) {
     data: {
       title: title.trim(),
       steps: steps.trim(),
+      servings: parseServings(servings),
       authorId: member.id,
       ingredients: {
         create: ingredients.map((ing: { quantity: string; unit: string; name: string; order: number }) => ({

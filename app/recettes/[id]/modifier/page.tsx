@@ -34,6 +34,7 @@ export default async function ModifierPage({
             name: i.name,
           })),
           steps: recipe.steps,
+          servings: recipe.servings,
         }}
       />
     </div>
