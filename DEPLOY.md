@@ -66,6 +66,12 @@ chmod 600 /opt/mijote/.env
 
 (`DATABASE_URL` est construit par le compose à partir de `POSTGRES_PASSWORD`.)
 
+> **Le mot de passe doit être sûr dans une URL** (pas de `@ : / ? # %`…), sinon Prisma échoue avec
+> `P1013 invalid port number in database URL`. Générer : `openssl rand -hex 24`.
+> Postgres ne lit le mot de passe qu'à l'initialisation du volume : si le volume `pgdata` existe déjà,
+> changer la valeur ne suffit pas (`docker compose -f docker-compose.prod.yml down -v` pour repartir
+> de zéro, ou `ALTER USER recettes PASSWORD '…'`).
+
 ### Réseau partagé avec Caddy
 
 ⚠️ Ces modifications se font **dans le dépôt Tableau-Clair**, pas sur le serveur : le workflow de
