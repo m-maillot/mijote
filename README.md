@@ -1,4 +1,4 @@
-# Mijoté
+# Ludlow Family's Cookbook
 
 Application web familiale pour collecter et partager les recettes de famille. Chaque membre se connecte avec un lien magique envoyé par email ou avec son compte Google (sans mot de passe). Les membres peuvent ajouter des recettes, et proposer des modifications sous forme de suggestions soumises au vote de la famille.
 
@@ -7,7 +7,7 @@ Application web familiale pour collecter et partager les recettes de famille. Ch
 - **Recettes structurées** : titre, ingrédients (quantité, unité, nom), étapes de préparation, photos
 - **Authentification simplifiée** : lien magique par email ou compte Google, réservé aux membres invités
 - **Suggestions collaboratives** : proposer des modifications sur le titre, les ingrédients ou les étapes
-- **Système de vote** : les suggestions sont appliquées automatiquement après approbation (seuil configurable)
+- **Pouce vers le haut** : les membres approuvent une suggestion d'un pouce ; elle ne modifie jamais la recette originale
 - **Vue diff** : visualisation des différences entre la recette et la suggestion
 - **Notifications email** : notification à toute la famille quand une nouvelle recette est ajoutée
 - **Administration** : invitation des membres (par email) par un compte admin
@@ -90,7 +90,7 @@ environment:
   SMTP_PORT: "587"
   SMTP_USER: "votre-login-brevo"
   SMTP_PASS: "votre-clé-smtp"
-  SMTP_FROM: "Carnet de Recettes <recettes@votredomaine.fr>"
+  SMTP_FROM: "Ludlow Family's Cookbook <recettes@votredomaine.fr>"
 ```
 
 ```bash
@@ -138,7 +138,6 @@ docker compose exec app node prisma/show-admin.js
 | `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` | Identifiants S3 | — |
 | `S3_ENDPOINT` | Endpoint S3 compatible (vide = AWS) | — |
 | `S3_FORCE_PATH_STYLE` | `true` pour MinIO et similaires | `false` |
-| `APPROVAL_THRESHOLD` | Nombre de votes pour approuver une suggestion | `2` |
 | `SMTP_HOST` | Serveur SMTP | — |
 | `SMTP_PORT` | Port SMTP | `587` |
 | `SMTP_USER` | Login SMTP | — |

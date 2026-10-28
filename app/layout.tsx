@@ -15,7 +15,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Mijoté",
+  title: "Ludlow Family's Cookbook",
   description: "Les recettes de la famille",
 };
 

@@ -11,22 +11,14 @@ const fieldLabels: Record<string, string> = {
   STEPS: "Préparation",
 };
 
-const statusLabels: Record<string, { label: string; className: string }> = {
-  PENDING: { label: "En attente", className: "bg-warning/20 text-warning" },
-  APPROVED: { label: "Appliquée", className: "bg-success/20 text-success" },
-  REJECTED: { label: "Rejetée", className: "bg-danger/20 text-danger" },
-};
-
 export default function SuggestionList({
   suggestions,
   currentMemberId,
   recipe,
-  threshold,
 }: {
   suggestions: CommentData[];
   currentMemberId: string;
   recipe: RecipeSnapshot;
-  threshold: number;
 }) {
   const router = useRouter();
 
@@ -39,12 +31,10 @@ export default function SuggestionList({
     byAuthor.set(s.author.id, group);
   }
 
-  async function handleVote(commentId: string, approve: boolean) {
+  async function handleToggleLike(commentId: string, liked: boolean) {
     try {
       const res = await fetch(`/api/comments/${commentId}/vote`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ approve }),
+        method: liked ? "DELETE" : "POST",
       });
       if (!res.ok) throw new Error();
       router.refresh();
@@ -67,20 +57,15 @@ export default function SuggestionList({
 
           <div className="mt-3 divide-y divide-line">
             {items.map((s) => {
-              const approves = s.votes.filter((v) => v.approve).length;
-              const myVote = s.votes.find((v) => v.memberId === currentMemberId);
+              const likers = s.votes.filter((v) => v.approve);
+              const liked = likers.some((v) => v.memberId === currentMemberId);
               const isAuthor = s.author.id === currentMemberId;
-              const status = statusLabels[s.status];
-              const percent = Math.min(100, Math.round((approves / threshold) * 100));
 
               return (
                 <div key={s.id} className="py-4 first:pt-0 last:pb-0">
                   <div className="mb-2 flex flex-wrap items-center gap-2 text-sm">
                     <span className="rounded-full bg-subtle px-2.5 py-0.5 text-muted">
                       {fieldLabels[s.field]}
-                    </span>
-                    <span className={`rounded-full px-2.5 py-0.5 ${status.className}`}>
-                      {status.label}
                     </span>
                     <span className="text-muted">
                       {new Date(s.createdAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}
@@ -89,38 +74,30 @@ export default function SuggestionList({
 
                   <DiffView comment={s} recipe={recipe} />
 
-                  {s.status === "PENDING" && (
-                    <div className="mt-4 flex flex-wrap items-center gap-4">
-                      <div className="flex min-w-[140px] flex-1 items-center gap-2.5">
-                        <div className="h-2 flex-1 rounded bg-line">
-                          <div className="h-2 rounded bg-success-solid" style={{ width: `${percent}%` }} />
-                        </div>
-                        <span className="text-sm text-muted">
-                          {approves} / {threshold} voix
-                        </span>
-                      </div>
-                      {!isAuthor && (
-                        <div className="flex w-full gap-3 sm:w-auto">
-                          <button
-                            type="button"
-                            onClick={() => handleVote(s.id, true)}
-                            disabled={myVote?.approve === true}
-                            className="min-h-12 flex-1 rounded-lg bg-success-solid px-5 font-semibold text-white transition-opacity disabled:opacity-60 sm:flex-none"
-                          >
-                            Je suis d&apos;accord
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleVote(s.id, false)}
-                            disabled={myVote?.approve === false}
-                            className="min-h-12 flex-1 rounded-lg border-[1.5px] border-danger px-5 font-semibold text-danger transition-opacity disabled:opacity-60 sm:flex-none"
-                          >
-                            Pas d&apos;accord
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  <div className="mt-4 flex items-center gap-3">
+                    {isAuthor ? (
+                      <span className="text-sm text-muted">
+                        {likers.length} {likers.length > 1 ? "pouces" : "pouce"}
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => handleToggleLike(s.id, liked)}
+                        aria-pressed={liked}
+                        aria-label={liked ? "Retirer mon pouce" : "Je suis d'accord avec cette suggestion"}
+                        className={`inline-flex min-h-12 items-center gap-2 rounded-lg border-[1.5px] px-5 font-semibold transition-colors ${
+                          liked
+                            ? "border-success-solid bg-success-solid text-white"
+                            : "border-success-solid text-success"
+                        }`}
+                      >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill={liked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M7 10v11H3V10h4zM7 10l4-8a2.5 2.5 0 0 1 2.5 2.5V8H20a2 2 0 0 1 2 2.3l-1.4 9A2 2 0 0 1 18.6 21H7" />
+                        </svg>
+                        {likers.length > 0 && <span>{likers.length}</span>}
+                      </button>
+                    )}
+                  </div>
                 </div>
               );
             })}

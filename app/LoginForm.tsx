@@ -36,8 +36,8 @@ export default function LoginForm({
   return (
     <main className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-md text-center">
-        <h1 className="font-heading mb-2 text-5xl font-semibold text-danger md:text-6xl">
-          Mijoté
+        <h1 className="font-heading mb-2 text-4xl font-semibold text-danger md:text-5xl">
+          Ludlow Family&apos;s Cookbook
         </h1>
         <p className="mb-10 text-lg text-muted">Les recettes de la famille</p>
 

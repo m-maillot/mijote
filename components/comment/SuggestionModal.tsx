@@ -29,11 +29,9 @@ function initialBody(field: string, recipe: RecipeSnapshot) {
 export default function SuggestionModal({
   recipeId,
   recipe,
-  threshold,
 }: {
   recipeId: string;
   recipe: RecipeSnapshot;
-  threshold: number;
 }) {
   const router = useRouter();
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -156,7 +154,7 @@ export default function SuggestionModal({
           </div>
 
           <p className="mb-3 text-sm text-muted">
-            Modifiez le contenu ci-dessous. Si {threshold} membres sont d&apos;accord, la recette sera mise à jour.
+            Modifiez le contenu ci-dessous. La recette n&apos;est pas modifiée : les autres membres pourront simplement approuver votre suggestion d&apos;un pouce.
           </p>
 
           {field === "INGREDIENTS" ? (

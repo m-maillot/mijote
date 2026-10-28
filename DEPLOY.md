@@ -4,14 +4,14 @@ Chaque push sur `main` (ou un lancement manuel dans l'onglet Actions) exécute
 `.github/workflows/deploy.yml` : build de l'image, push sur `ghcr.io/m-maillot/mijote`, copie de
 `docker-compose.prod.yml` sur le VPS puis `docker compose up -d` en SSH.
 
-Le VPS héberge déjà Tableau-Clair, dont le Caddy occupe les ports 80/443. Mijoté ne lance donc pas
+Le VPS héberge déjà Tableau-Clair, dont le Caddy occupe les ports 80/443. Ludlow Family's Cookbook ne lance donc pas
 son propre proxy : il se rattache au même réseau Docker (`proxy`) et le Caddy existant route vers lui.
 
 ## 0. Prérequis
 
 - Le VPS a été préparé avec `scripts/bootstrap-server.sh` (dépôt Tableau-Clair) : Docker installé,
   utilisateur `deploy` **sans mot de passe et sans sudo**, connexion SSH par clé uniquement,
-  pare-feu ouvert sur 22/80/443 (rien à changer pour Mijoté).
+  pare-feu ouvert sur 22/80/443 (rien à changer pour Ludlow Family's Cookbook).
 - Tableau-Clair est déployé : c'est lui qui porte Caddy et crée le réseau `proxy`.
 - DNS de `ludlows.fr` : enregistrements `A` et `AAAA` vers le VPS (mêmes valeurs que
   `tableau-clair.fr`).
@@ -42,7 +42,6 @@ Puis, connecté en `deploy` (`ssh deploy@<IP>`), crée `/opt/mijote/.env` :
 
 ```env
 POSTGRES_PASSWORD=<mot de passe généré>
-APPROVAL_THRESHOLD=2
 
 # Photos (S3)
 S3_BUCKET="..."
@@ -60,7 +59,7 @@ SMTP_HOST="smtp-relay.brevo.com"
 SMTP_PORT="587"
 SMTP_USER="..."
 SMTP_PASS="..."
-SMTP_FROM="Carnet de Recettes <recettes@ludlows.fr>"
+SMTP_FROM="Ludlow Family's Cookbook <recettes@ludlows.fr>"
 # Import de recette par photo (optionnel ; sans clé, le bouton est masqué)
 ANTHROPIC_API_KEY="..."
 ANTHROPIC_MODEL="claude-sonnet-5-5"
@@ -115,7 +114,7 @@ Puis pousser sur `main` : le workflow de Tableau-Clair déploie et recrée Caddy
 de coupure sur `tableau-clair.fr`). Ne relance pas `docker compose` à la main : sans la variable
 `APP_IMAGE`, il tente de reconstruire l'image et échoue.
 
-Côté Mijoté, le `docker-compose.prod.yml` rattache **uniquement le service web** au réseau
+Côté Ludlow Family's Cookbook, le `docker-compose.prod.yml` rattache **uniquement le service web** au réseau
 `proxy` (jamais la base de données) :
 
 ```yaml
@@ -131,7 +130,7 @@ networks:
     name: proxy
 ```
 
-Le réseau doit exister avant le premier déploiement de Mijoté : déploie donc Tableau-Clair
+Le réseau doit exister avant le premier déploiement de Ludlow Family's Cookbook : déploie donc Tableau-Clair
 d'abord.
 
 > Limite : Caddy appartient à la pile Tableau-Clair (`depends_on` sur son application). Si elle ne
@@ -167,7 +166,7 @@ workflow fait `docker login` sur le serveur avec le `GITHUB_TOKEN` le temps du `
 ## 4. Premier déploiement
 
 1. Tableau-Clair est déployé avec le réseau `proxy` et le bloc `ludlows.fr`.
-2. Push sur `main` de Mijoté (ou Actions → Deploy → Run workflow).
+2. Push sur `main` de Ludlow Family's Cookbook (ou Actions → Deploy → Run workflow).
 3. Vérifier : `https://ludlows.fr` (le premier certificat peut prendre une minute).
 
 En cas de souci, sur le serveur en `deploy` :

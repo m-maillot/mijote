@@ -39,7 +39,6 @@ export default async function RecipeDetailPage({
   const isAuthor = recipe.authorId === member.id;
   const steps = recipe.steps.split("\n").filter(Boolean);
 
-  const threshold = parseInt(process.env.APPROVAL_THRESHOLD || "2", 10);
   const snapshot = {
     title: recipe.title,
     ingredients: recipe.ingredients.map((i) => ({
@@ -81,7 +80,7 @@ export default async function RecipeDetailPage({
             Modifier
           </Link>
         ) : (
-          <SuggestionModal recipeId={recipe.id} recipe={snapshot} threshold={threshold} />
+          <SuggestionModal recipeId={recipe.id} recipe={snapshot} />
         )}
       </div>
 
@@ -153,7 +152,6 @@ export default async function RecipeDetailPage({
             suggestions={comments.filter((c) => c.field !== "GENERAL")}
             currentMemberId={member.id}
             recipe={snapshot}
-            threshold={threshold}
           />
           <FamilyNotes
             recipeId={recipe.id}
